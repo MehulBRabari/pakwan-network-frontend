@@ -28,7 +28,7 @@ import { setSocket } from "./redux/userSlice";
 import InvoicePage from "./pages/InvoicePage";
 
 // export const serverUrl = "http://localhost:8000";
-export const serverUrl = "https://pakwan-network-backend.onrender.com";
+export const serverUrl = "https://pakwan-network-backend.onrender.com"
 
 function App() {
   const { userData } = useSelector((state) => state.user);
