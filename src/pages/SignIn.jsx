@@ -1,15 +1,15 @@
-import React, { useState } from 'react'
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa"
-import { FcGoogle } from "react-icons/fc"
-import { useNavigate } from 'react-router-dom'
-import axios from "axios"
-import { serverUrl } from '../App'
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
-import { auth } from '../../firebase'
-import { ClipLoader } from 'react-spinners'
-import { useDispatch } from 'react-redux'
-import { setUserData } from '../redux/userSlice'
-import BrandLogo from '../components/BrandLogo'
+import React, { useState } from "react";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { serverUrl } from "../App";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../../firebase";
+import { ClipLoader } from "react-spinners";
+import { useDispatch } from "react-redux";
+import { setUserData } from "../redux/userSlice";
+import BrandLogo from "../components/BrandLogo";
 
 const S = `
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Outfit:wght@300;400;500;600;700;800&display=swap');
@@ -79,36 +79,57 @@ const S = `
 .si-footer a{color:#F47B1F;font-weight:700;cursor:pointer;text-decoration:none;}
 .si-footer a:hover{text-decoration:underline;}
 @media(min-width:900px){.si-left{display:flex;}}
-`
+`;
 
 function SignIn() {
-  const [showPwd, setShowPwd] = useState(false)
-  const navigate = useNavigate()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [err, setErr] = useState('')
-  const [loading, setLoading] = useState(false)
-  const dispatch = useDispatch()
+  const [showPwd, setShowPwd] = useState(false);
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const handleSignIn = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const result = await axios.post(`${serverUrl}/api/auth/signin`, { email, password }, { withCredentials: true })
-      dispatch(setUserData(result.data)); setErr('')
+      const result = await axios.post(
+        `${serverUrl}/api/auth/signin`,
+        { email, password },
+        { withCredentials: true },
+      );
+
+      console.log("BACKEND PAYLOAD:", result.data); // <-- Added safe-check
+
+      dispatch(setUserData(result.data));
+      setErr("");
+      navigate("/"); // <-- ADDED: Tells React "We are logged in, take me to the home page"
     } catch (error) {
-      setErr(error?.response?.data?.message || 'Sign in failed. Please try again.')
+      console.error("Sign in catch:", error);
+      setErr(
+        error?.response?.data?.message || "Sign in failed. Please try again.",
+      );
+    } finally {
+      setLoading(false);
     }
-    setLoading(false)
-  }
+  };
 
   const handleGoogleAuth = async () => {
-    const provider = new GoogleAuthProvider()
-    const result = await signInWithPopup(auth, provider)
+    const provider = new GoogleAuthProvider();
     try {
-      const { data } = await axios.post(`${serverUrl}/api/auth/google-auth`, { email: result.user.email }, { withCredentials: true })
-      dispatch(setUserData(data))
-    } catch (e) { console.log(e) }
-  }
+      const result = await signInWithPopup(auth, provider);
+      const { data } = await axios.post(
+        `${serverUrl}/api/auth/google-auth`,
+        { email: result.user.email },
+        { withCredentials: true },
+      );
+
+      dispatch(setUserData(data));
+      navigate("/"); // <-- ADDED
+    } catch (e) {
+      console.error("Google Auth Error:", e);
+    }
+  };
 
   return (
     <div className="si">
@@ -117,61 +138,144 @@ function SignIn() {
       {/* Left panel */}
       <div className="si-left">
         <div className="si-left-grid" />
-        <div className="si-left-orb" style={{ top: '-10%', right: '-10%', width: 400, height: 400, background: 'radial-gradient(circle,rgba(244,123,31,0.2),transparent 65%)' }} />
-        <div className="si-left-orb" style={{ bottom: '-10%', left: '-10%', width: 280, height: 280, background: 'radial-gradient(circle,rgba(250,160,64,0.12),transparent 65%)' }} />
+        <div
+          className="si-left-orb"
+          style={{
+            top: "-10%",
+            right: "-10%",
+            width: 400,
+            height: 400,
+            background:
+              "radial-gradient(circle,rgba(244,123,31,0.2),transparent 65%)",
+          }}
+        />
+        <div
+          className="si-left-orb"
+          style={{
+            bottom: "-10%",
+            left: "-10%",
+            width: 280,
+            height: 280,
+            background:
+              "radial-gradient(circle,rgba(250,160,64,0.12),transparent 65%)",
+          }}
+        />
         <div className="si-left-content">
-          <BrandLogo size="lg" theme="dark" tagline="Network" style={{ marginBottom: 72 }} />
-          <div className="si-left-headline">Welcome back<br />to <span>great food</span></div>
-          <p className="si-left-desc">Sign in to discover the best restaurants near you, track your orders live, and enjoy seamless delivery.</p>
+          <BrandLogo
+            size="lg"
+            theme="dark"
+            tagline="Network"
+            style={{ marginBottom: 72 }}
+          />
+          <div className="si-left-headline">
+            Welcome back
+            <br />
+            to <span>great food</span>
+          </div>
+          <p className="si-left-desc">
+            Sign in to discover the best restaurants near you, track your orders
+            live, and enjoy seamless delivery.
+          </p>
           <div className="si-left-stats">
-            {[{ v: '50K+', l: 'Happy Customers' }, { v: '1200+', l: 'Restaurants' }, { v: '25 min', l: 'Avg Delivery' }].map(s => (
-              <div key={s.l}><div className="si-left-stat-v">{s.v}</div><div className="si-left-stat-l">{s.l}</div></div>
+            {[
+              { v: "50K+", l: "Happy Customers" },
+              { v: "1200+", l: "Restaurants" },
+              { v: "25 min", l: "Avg Delivery" },
+            ].map((s) => (
+              <div key={s.l}>
+                <div className="si-left-stat-v">{s.v}</div>
+                <div className="si-left-stat-l">{s.l}</div>
+              </div>
             ))}
           </div>
         </div>
         <div className="si-testimonial">
-          <div className="si-testimonial-text">"Pakwan Network changed how I order food. Live tracking, amazing restaurants, and always on time!"</div>
-          <div className="si-testimonial-author">— Priya S., Mumbai · 120+ orders</div>
+          <div className="si-testimonial-text">
+            "Pakwan Network changed how I order food. Live tracking, amazing
+            restaurants, and always on time!"
+          </div>
+          <div className="si-testimonial-author">
+            — Priya S., Mumbai · 120+ orders
+          </div>
         </div>
       </div>
 
       {/* Right panel */}
       <div className="si-right">
         <div className="si-card">
-          <BrandLogo size="sm" theme="light" tagline="Network" style={{ marginBottom: 8 }} />
-          <h1 className="si-heading">Sign <span>In</span></h1>
-          <p className="si-tagline">Don't have an account? <a style={{ color: '#F47B1F', fontWeight: 700, cursor: 'pointer' }} onClick={() => navigate('/signup')}>Sign up free →</a></p>
+          <BrandLogo
+            size="sm"
+            theme="light"
+            tagline="Network"
+            style={{ marginBottom: 8 }}
+          />
+          <h1 className="si-heading">
+            Sign <span>In</span>
+          </h1>
+          <p className="si-tagline">
+            Don't have an account?{" "}
+            <a
+              style={{ color: "#F47B1F", fontWeight: 700, cursor: "pointer" }}
+              onClick={() => navigate("/signup")}
+            >
+              Sign up free →
+            </a>
+          </p>
 
           {err && <div className="si-err">⚠️ {err}</div>}
 
           <label className="si-label">Email Address</label>
           <div className="si-input-wrap">
-            <input className="si-input" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSignIn()} />
+            <input
+              className="si-input"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSignIn()}
+            />
           </div>
 
           <label className="si-label">Password</label>
           <div className="si-input-wrap">
-            <input className="si-input" type={showPwd ? 'text' : 'password'} placeholder="Enter your password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSignIn()} style={{ paddingRight: 46 }} />
-            <button className="si-eye" onClick={() => setShowPwd(!showPwd)}>{showPwd ? <FaRegEyeSlash size={17} /> : <FaRegEye size={17} />}</button>
+            <input
+              className="si-input"
+              type={showPwd ? "text" : "password"}
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSignIn()}
+              style={{ paddingRight: 46 }}
+            />
+            <button className="si-eye" onClick={() => setShowPwd(!showPwd)}>
+              {showPwd ? <FaRegEyeSlash size={17} /> : <FaRegEye size={17} />}
+            </button>
           </div>
-          <span className="si-forgot" onClick={() => navigate('/forgot-password')}>Forgot password?</span>
+          <span
+            className="si-forgot"
+            onClick={() => navigate("/forgot-password")}
+          >
+            Forgot password?
+          </span>
 
           <button className="si-btn" onClick={handleSignIn} disabled={loading}>
-            {loading ? <ClipLoader size={18} color="white" /> : 'Sign In →'}
+            {loading ? <ClipLoader size={18} color="white" /> : "Sign In →"}
           </button>
 
           <div className="si-divider">or continue with</div>
 
           <button className="si-google-btn" onClick={handleGoogleAuth}>
-            <FcGoogle size={22} />Continue with Google
+            <FcGoogle size={22} />
+            Continue with Google
           </button>
 
           <div className="si-footer">
-            New to Pakwan Network? <a onClick={() => navigate('/signup')}>Create an account</a>
+            New to Pakwan Network?{" "}
+            <a onClick={() => navigate("/signup")}>Create an account</a>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
-export default SignIn
+export default SignIn;
