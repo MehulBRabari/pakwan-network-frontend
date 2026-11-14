@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
-import { FaLeaf, FaDrumstickBite, FaStar, FaFire } from "react-icons/fa"
-import { FaMinus, FaPlus } from "react-icons/fa"
-import { FiShoppingCart } from "react-icons/fi"
-import { useDispatch, useSelector } from 'react-redux'
-import { addToCart } from '../redux/userSlice'
+import React, { useState } from "react";
+import { FaLeaf, FaDrumstickBite, FaStar, FaFire } from "react-icons/fa";
+import { FaMinus, FaPlus } from "react-icons/fa";
+import { FiShoppingCart } from "react-icons/fi";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../redux/userSlice";
 
 const S = `
 .fc{
@@ -53,28 +53,45 @@ const S = `
 .fc-add-btn:hover{transform:scale(1.12);box-shadow:0 7px 20px rgba(244,123,31,0.55);}
 .fc-added{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(34,197,94,0.12);border:2px solid rgba(34,197,94,0.3);border-radius:22px;pointer-events:none;animation:fcAdded 0.4s ease;opacity:0;}
 @keyframes fcAdded{0%{opacity:1;transform:scale(1);}100%{opacity:0;transform:scale(1.03);}}
-`
+`;
 
 function FoodCard({ data }) {
-  const dispatch = useDispatch()
-  const { cartItems, userData } = useSelector(s => s.user)
-  const [flash, setFlash] = useState(false)
-  const inCart = cartItems?.find(c => c.id === data._id)
-  const qty = inCart?.quantity || 0
+  const dispatch = useDispatch();
+  const { cartItems, userData } = useSelector((s) => s.user);
+  const [flash, setFlash] = useState(false);
+  const inCart = cartItems?.find((c) => c.id === data._id);
+  const qty = inCart?.quantity || 0;
 
   const add = () => {
-    dispatch(addToCart({ id: data._id, name: data.name, price: data.price, image: data.image, shop: data.shopId, shopName: data.shopName, foodType: data.foodType, quantity: 1 }))
-    setFlash(true); setTimeout(() => setFlash(false), 500)
-  }
+    dispatch(
+      addToCart({
+        id: data._id,
+        name: data.name,
+        price: data.price,
+        image: data.image,
+        shop: data.shopId,
+        shopName: data.shopName,
+        foodType: data.foodType,
+        quantity: 1,
+      }),
+    );
+    setFlash(true);
+    setTimeout(() => setFlash(false), 500);
+  };
   const remove = () => {
-    if (qty > 1) dispatch({ type: 'user/updateQuantity', payload: { id: data._id, quantity: qty - 1 } })
-    else dispatch({ type: 'user/removeCartItem', payload: data._id })
-  }
+    if (qty > 1)
+      dispatch({
+        type: "user/updateQuantity",
+        payload: { id: data._id, quantity: qty - 1 },
+      });
+    else dispatch({ type: "user/removeCartItem", payload: data._id });
+  };
 
-  const avgRating = data.rating?.count > 0 ? data.rating.average.toFixed(1) : null
-  const ratingCount = data.rating?.count || 0
-  const isVeg = data.foodType === 'veg'
-  const isNew = !ratingCount || ratingCount < 3
+  const avgRating =
+    data.rating?.count > 0 ? data.rating.average.toFixed(1) : null;
+  const ratingCount = data.rating?.count || 0;
+  const isVeg = data.foodType === "veg";
+  const isNew = !ratingCount || ratingCount < 3;
 
   return (
     <div className="fc">
@@ -82,22 +99,45 @@ function FoodCard({ data }) {
       <div className="fc-img-wrap">
         <img className="fc-img" src={data.image} alt={data.name} />
         <div className="fc-img-overlay" />
-        {isNew
-          ? <div className="fc-badge" style={{ background: 'rgba(99,102,241,0.92)', color: 'white' }}>✨ New</div>
-          : avgRating >= 4.5 ? <div className="fc-badge" style={{ background: 'rgba(244,123,31,0.92)', color: 'white' }}><FaFire size={9} style={{ marginRight: 3 }} />Hot</div>
-          : null}
-        <div className="fc-type-pill" style={{ color: isVeg ? '#16a34a' : '#dc2626' }}>
+        {isNew ? (
+          <div
+            className="fc-badge"
+            style={{ background: "rgba(99,102,241,0.92)", color: "white" }}
+          >
+            ✨ New
+          </div>
+        ) : avgRating >= 4.5 ? (
+          <div
+            className="fc-badge"
+            style={{ background: "rgba(244,123,31,0.92)", color: "white" }}
+          >
+            <FaFire size={9} style={{ marginRight: 3 }} />
+            Hot
+          </div>
+        ) : null}
+        <div
+          className="fc-type-pill"
+          style={{ color: isVeg ? "#16a34a" : "#dc2626" }}
+        >
           {isVeg ? <FaLeaf size={10} /> : <FaDrumstickBite size={10} />}
-          {isVeg ? 'Veg' : 'Non-Veg'}
+          {isVeg ? "Veg" : "Non-Veg"}
         </div>
       </div>
 
       <div className="fc-body">
         <div className="fc-name">{data.name}</div>
-        <div className="fc-shop">🏪 {data.shopName || 'Restaurant'}</div>
+        <div className="fc-shop">🏪 {data.shopName || "Restaurant"}</div>
         {avgRating && (
           <div className="fc-rating">
-            <div className="fc-stars">{[1,2,3,4,5].map(s => <FaStar key={s} size={10} color={s <= Math.round(avgRating) ? '#F47B1F' : '#e5e7eb'} />)}</div>
+            <div className="fc-stars">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <FaStar
+                  key={s}
+                  size={10}
+                  color={s <= Math.round(avgRating) ? "#F47B1F" : "#e5e7eb"}
+                />
+              ))}
+            </div>
             <span className="fc-rating-val">{avgRating}</span>
             <span className="fc-count">({ratingCount})</span>
           </div>
@@ -107,22 +147,34 @@ function FoodCard({ data }) {
       <div className="fc-bottom">
         <div>
           <div className="fc-price">₹{data.price}</div>
-          <div style={{ fontSize: 11, color: '#917850', marginTop: 2 }}>per item</div>
+          <div style={{ fontSize: 11, color: "#917850", marginTop: 2 }}>
+            per item
+          </div>
         </div>
-        {userData?.role !== 'owner' && userData?.role !== 'deliveryBoy' && (
-          qty > 0 ? (
+        {userData?.role !== "owner" &&
+          userData?.role !== "deliveryBoy" &&
+          (qty > 0 ? (
             <div className="fc-qty-wrap">
-              <button className="fc-qty-btn" onClick={remove}><FaMinus size={10} /></button>
+              <button className="fc-qty-btn" onClick={remove}>
+                <FaMinus size={10} />
+              </button>
               <span className="fc-qty">{qty}</span>
-              <button className="fc-qty-btn" onClick={add}><FaPlus size={10} /></button>
+              <button className="fc-qty-btn" onClick={add}>
+                <FaPlus size={10} />
+              </button>
             </div>
           ) : (
-            <button className="fc-add-btn" onClick={add}><FiShoppingCart size={16} /></button>
-          )
-        )}
+            <button className="fc-add-btn" onClick={add}>
+              <FiShoppingCart size={16} />
+            </button>
+          ))}
       </div>
-      {flash && <div className="fc-added"><span style={{ fontSize: 28 }}>✓</span></div>}
+      {flash && (
+        <div className="fc-added">
+          <span style={{ fontSize: 28 }}>✓</span>
+        </div>
+      )}
     </div>
-  )
+  );
 }
-export default FoodCard
+export default FoodCard;

@@ -1,8 +1,8 @@
-import React from 'react'
-import { FaMinus, FaPlus, FaLeaf, FaDrumstickBite } from "react-icons/fa"
-import { MdDeleteOutline } from "react-icons/md"
-import { useDispatch } from 'react-redux'
-import { removeCartItem, updateQuantity } from '../redux/userSlice'
+import React from "react";
+import { FaMinus, FaPlus, FaLeaf, FaDrumstickBite } from "react-icons/fa";
+import { MdDeleteOutline } from "react-icons/md";
+import { useDispatch } from "react-redux";
+import { removeCartItem, updateQuantity } from "../redux/userSlice";
 
 const S = `
 .cic{
@@ -25,10 +25,10 @@ const S = `
 .cic-qty{width:30px;text-align:center;font-weight:900;font-size:14px;color:#1C1507;}
 .cic-del{width:38px;height:38px;border-radius:13px;background:rgba(220,38,38,0.07);border:2px solid rgba(220,38,38,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;color:#dc2626;}
 .cic-del:hover{background:rgba(220,38,38,0.14);border-color:rgba(220,38,38,0.28);transform:scale(1.07);}
-`
+`;
 
 function CartItemCard({ data }) {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   return (
     <div className="cic">
       <style>{S}</style>
@@ -36,21 +36,62 @@ function CartItemCard({ data }) {
       <div className="cic-content">
         <div className="cic-name">{data.name}</div>
         <div className="cic-meta">
-          {data.foodType === 'veg' ? <><FaLeaf size={10} color="#16a34a" />Veg</> : <><FaDrumstickBite size={10} color="#dc2626" />Non-Veg</>}
-          <span>·</span><span>{data.shopName || 'Restaurant'}</span>
+          {data.foodType === "veg" ? (
+            <>
+              <FaLeaf size={10} color="#16a34a" />
+              Veg
+            </>
+          ) : (
+            <>
+              <FaDrumstickBite size={10} color="#dc2626" />
+              Non-Veg
+            </>
+          )}
+          <span>·</span>
+          <span>{data.shopName || "Restaurant"}</span>
         </div>
         <div className="cic-price">₹{data.price * data.quantity}</div>
-        <div className="cic-unit">₹{data.price} × {data.quantity}</div>
+        <div className="cic-unit">
+          ₹{data.price} × {data.quantity}
+        </div>
       </div>
       <div className="cic-actions">
         <div className="cic-controls">
-          <button className="cic-ctrl" onClick={() => data.quantity > 1 ? dispatch(updateQuantity({ id: data.id, quantity: data.quantity - 1 })) : dispatch(removeCartItem(data.id))}><FaMinus size={10} /></button>
+          <button
+            className="cic-ctrl"
+            onClick={() =>
+              data.quantity > 1
+                ? dispatch(
+                    updateQuantity({
+                      id: data.id,
+                      quantity: data.quantity - 1,
+                    }),
+                  )
+                : dispatch(removeCartItem(data.id))
+            }
+          >
+            <FaMinus size={10} />
+          </button>
           <span className="cic-qty">{data.quantity}</span>
-          <button className="cic-ctrl" onClick={() => dispatch(updateQuantity({ id: data.id, quantity: data.quantity + 1 }))}><FaPlus size={10} /></button>
+          <button
+            className="cic-ctrl"
+            onClick={() =>
+              dispatch(
+                updateQuantity({ id: data.id, quantity: data.quantity + 1 }),
+              )
+            }
+          >
+            <FaPlus size={10} />
+          </button>
         </div>
-        <button className="cic-del" onClick={() => dispatch(removeCartItem(data.id))}><MdDeleteOutline size={19} /></button>
+        <button
+          className="cic-del"
+          onClick={() => dispatch(removeCartItem(data.id))}
+        >
+          <MdDeleteOutline size={19} />
+        </button>
       </div>
     </div>
-  )
+  );
 }
-export default CartItemCard
+export default CartItemCard;

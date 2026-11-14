@@ -1,16 +1,29 @@
-import React from 'react'
-import Nav from './Nav'
-import { useSelector } from 'react-redux'
-import axios from 'axios'
-import { serverUrl } from '../App'
-import { useEffect } from 'react'
-import { useState } from 'react'
-import DeliveryBoyTracking from './DeliveryBoyTracking'
-import { ClipLoader } from 'react-spinners'
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { FaMotorcycle, FaCheckCircle, FaBoxOpen, FaRupeeSign } from 'react-icons/fa'
-import { MdLocationOn, MdAssignment, MdDeliveryDining } from 'react-icons/md'
-import { IoMdTime } from 'react-icons/io'
+import React from "react";
+import Nav from "./Nav";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import { serverUrl } from "../App";
+import { useEffect } from "react";
+import { useState } from "react";
+import DeliveryBoyTracking from "./DeliveryBoyTracking";
+import { ClipLoader } from "react-spinners";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import {
+  FaMotorcycle,
+  FaCheckCircle,
+  FaBoxOpen,
+  FaRupeeSign,
+} from "react-icons/fa";
+import { MdLocationOn, MdAssignment, MdDeliveryDining } from "react-icons/md";
+import { IoMdTime } from "react-icons/io";
 
 const S = `
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Outfit:wght@400;500;600;700;800&display=swap');
@@ -51,111 +64,162 @@ const S = `
 .db-earning-card{background:linear-gradient(135deg,rgba(34,197,94,0.08),rgba(22,163,74,0.04));border:2px solid rgba(34,197,94,0.15);border-radius:20px;padding:24px;text-align:center;margin-top:20px;}
 .db-earning-label{font-size:12px;color:#917850;font-weight:700;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:8px;}
 .db-earning-amount{font-family:'Fraunces',serif;font-size:2.5rem;font-weight:700;color:#16a34a;}
-`
+`;
 
 function DeliveryBoy() {
-  const {userData, socket} = useSelector(state => state.user)
-  const [currentOrder, setCurrentOrder] = useState(null)
-  const [showOtpBox, setShowOtpBox] = useState(false)
-  const [availableAssignments, setAvailableAssignments] = useState([])
-  const [otp, setOtp] = useState("")
-  const [todayDeliveries, setTodayDeliveries] = useState([])
-  const [deliveryBoyLocation, setDeliveryBoyLocation] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState("")
+  const { userData, socket } = useSelector((state) => state.user);
+  const [currentOrder, setCurrentOrder] = useState(null);
+  const [showOtpBox, setShowOtpBox] = useState(false);
+  const [availableAssignments, setAvailableAssignments] = useState([]);
+  const [otp, setOtp] = useState("");
+  const [todayDeliveries, setTodayDeliveries] = useState([]);
+  const [deliveryBoyLocation, setDeliveryBoyLocation] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const totalDeliveriesToday = todayDeliveries.reduce((sum, d) => sum + d.count, 0)
-  const ratePerDelivery = 50
-  const totalEarning = totalDeliveriesToday * ratePerDelivery
+  const totalDeliveriesToday = todayDeliveries.reduce(
+    (sum, d) => sum + d.count,
+    0,
+  );
+  const ratePerDelivery = 50;
+  const totalEarning = totalDeliveriesToday * ratePerDelivery;
 
   useEffect(() => {
-    if (!socket || userData.role !== "deliveryBoy") return
-    let watchId
+    if (!socket || userData.role !== "deliveryBoy") return;
+    let watchId;
     if (navigator.geolocation) {
       watchId = navigator.geolocation.watchPosition(
         (position) => {
-          const latitude = position.coords.latitude
-          const longitude = position.coords.longitude
-          setDeliveryBoyLocation({ lat: latitude, lon: longitude })
-          socket.emit('updateLocation', { latitude, longitude, userId: userData._id })
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          setDeliveryBoyLocation({ lat: latitude, lon: longitude });
+          socket.emit("updateLocation", {
+            latitude,
+            longitude,
+            userId: userData._id,
+          });
         },
-        (error) => { console.log(error) },
-        { enableHighAccuracy: true }
-      )
+        (error) => {
+          console.log(error);
+        },
+        { enableHighAccuracy: true },
+      );
     }
-    return () => { if (watchId) navigator.geolocation.clearWatch(watchId) }
-  }, [socket, userData])
+    return () => {
+      if (watchId) navigator.geolocation.clearWatch(watchId);
+    };
+  }, [socket, userData]);
 
   const getAssignments = async () => {
     try {
-      const result = await axios.get(`${serverUrl}/api/order/get-assignments`, { withCredentials: true })
-      setAvailableAssignments(result.data)
-    } catch (error) { console.log(error) }
-  }
+      const result = await axios.get(`${serverUrl}/api/order/get-assignments`, {
+        withCredentials: true,
+      });
+      setAvailableAssignments(result.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getCurrentOrder = async () => {
     try {
-      const result = await axios.get(`${serverUrl}/api/order/get-current-order`, { withCredentials: true })
-      setCurrentOrder(result.data)
-    } catch (error) { console.log(error) }
-  }
+      const result = await axios.get(
+        `${serverUrl}/api/order/get-current-order`,
+        { withCredentials: true },
+      );
+      setCurrentOrder(result.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const acceptOrder = async (assignmentId) => {
     try {
-      await axios.post(`${serverUrl}/api/order/accept-order/${assignmentId}`, {}, { withCredentials: true })
-      setAvailableAssignments([])
-      await getCurrentOrder()
-    } catch (error) { console.log(error) }
-  }
+      await axios.post(
+        `${serverUrl}/api/order/accept-order/${assignmentId}`,
+        {},
+        { withCredentials: true },
+      );
+      setAvailableAssignments([]);
+      await getCurrentOrder();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
-    if (!socket) return
-    socket.on('newAssignment', (data) => {
-      setAvailableAssignments(prev => ([...prev, data]))
-    })
-    return () => { socket.off('newAssignment') }
-  }, [socket])
+    if (!socket) return;
+    socket.on("newAssignment", (data) => {
+      setAvailableAssignments((prev) => [...prev, data]);
+    });
+    return () => {
+      socket.off("newAssignment");
+    };
+  }, [socket]);
 
   const sendOtp = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      await axios.post(`${serverUrl}/api/order/send-delivery-otp`, {
-        orderId: currentOrder._id, shopOrderId: currentOrder.shopOrder._id
-      }, { withCredentials: true })
-      setShowOtpBox(true)
-    } catch (error) { console.log(error) }
-    setLoading(false)
-  }
+      await axios.post(
+        `${serverUrl}/api/order/send-delivery-otp`,
+        {
+          orderId: currentOrder._id,
+          shopOrderId: currentOrder.shopOrder._id,
+        },
+        { withCredentials: true },
+      );
+      setShowOtpBox(true);
+    } catch (error) {
+      console.log(error);
+    }
+    setLoading(false);
+  };
 
   const verifyOtp = async () => {
-    setMessage("")
+    setMessage("");
     try {
-      const result = await axios.post(`${serverUrl}/api/order/verify-delivery-otp`, {
-        orderId: currentOrder._id, shopOrderId: currentOrder.shopOrder._id, otp
-      }, { withCredentials: true })
-      setMessage(result.data.message)
-      setTimeout(() => window.location.reload(), 1200)
-    } catch (error) { console.log(error) }
-  }
+      const result = await axios.post(
+        `${serverUrl}/api/order/verify-delivery-otp`,
+        {
+          orderId: currentOrder._id,
+          shopOrderId: currentOrder.shopOrder._id,
+          otp,
+        },
+        { withCredentials: true },
+      );
+      setMessage(result.data.message);
+      setTimeout(() => window.location.reload(), 1200);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleTodayDeliveries = async () => {
     try {
-      const result = await axios.get(`${serverUrl}/api/order/get-today-deliveries`, { withCredentials: true })
-      setTodayDeliveries(result.data)
-    } catch (error) { console.log(error) }
-  }
+      const result = await axios.get(
+        `${serverUrl}/api/order/get-today-deliveries`,
+        { withCredentials: true },
+      );
+      setTodayDeliveries(result.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
-    getAssignments()
-    getCurrentOrder()
-    handleTodayDeliveries()
-  }, [userData?._id])
+    getAssignments();
+    getCurrentOrder();
+    handleTodayDeliveries();
+  }, [userData?._id]);
 
-  const liveLocation = deliveryBoyLocation || (
-    userData.location?.coordinates?.length === 2
-      ? { lat: userData.location.coordinates[1], lon: userData.location.coordinates[0] }
-      : null
-  )
+  const liveLocation =
+    deliveryBoyLocation ||
+    (userData.location?.coordinates?.length === 2
+      ? {
+          lat: userData.location.coordinates[1],
+          lon: userData.location.coordinates[0],
+        }
+      : null);
 
   return (
     <div className="db-wrap">
@@ -167,15 +231,24 @@ function DeliveryBoy() {
         <div className="db-hero-orb1" />
         <div className="db-hero-orb2" />
         <div className="db-hero-inner">
-          <div className="db-badge"><FaMotorcycle size={12} />Delivery Partner Dashboard</div>
+          <div className="db-badge">
+            <FaMotorcycle size={12} />
+            Delivery Partner Dashboard
+          </div>
           <h1 className="db-hero-title">
-            Welcome back,<br /><span>{userData.fullName}!</span>
+            Welcome back,
+            <br />
+            <span>{userData.fullName}!</span>
           </h1>
-          <p className="db-hero-sub">Manage your deliveries, track earnings and stay on top of your assignments.</p>
+          <p className="db-hero-sub">
+            Manage your deliveries, track earnings and stay on top of your
+            assignments.
+          </p>
           {liveLocation && (
             <div className="db-loc-pill">
               <MdLocationOn size={15} color="#F47B1F" />
-              Live: {liveLocation.lat?.toFixed(4)}, {liveLocation.lon?.toFixed(4)}
+              Live: {liveLocation.lat?.toFixed(4)},{" "}
+              {liveLocation.lon?.toFixed(4)}
             </div>
           )}
           <div className="db-stats-row">
@@ -196,46 +269,95 @@ function DeliveryBoy() {
       </section>
 
       <div className="db-body">
-
         {/* Current Order */}
         {currentOrder && (
           <div className="db-card">
-            <h2 className="db-card-title"><MdDeliveryDining color="#F47B1F" size={22} />Current Delivery</h2>
+            <h2 className="db-card-title">
+              <MdDeliveryDining color="#F47B1F" size={22} />
+              Current Delivery
+            </h2>
             <div className="db-current-order">
-              <p style={{ fontWeight: 800, fontSize: 15, color: '#1C1507', marginBottom: 4 }}>
-                {currentOrder?.shopOrder?.shopOrderItems?.length} items · ₹{currentOrder?.shopOrder?.subtotal}
+              <p
+                style={{
+                  fontWeight: 800,
+                  fontSize: 15,
+                  color: "#1C1507",
+                  marginBottom: 4,
+                }}
+              >
+                {currentOrder?.shopOrder?.shopOrderItems?.length} items · ₹
+                {currentOrder?.shopOrder?.subtotal}
               </p>
-              <p style={{ fontSize: 13, color: '#917850', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <p
+                style={{
+                  fontSize: 13,
+                  color: "#917850",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
                 <MdLocationOn size={14} color="#F47B1F" />
                 {currentOrder.deliveryAddress.text}
               </p>
-              <p style={{ fontSize: 13, color: '#917850', marginTop: 4 }}>
-                Customer: <strong style={{ color: '#1C1507' }}>{currentOrder.user?.fullName}</strong> · {currentOrder.user?.mobile}
+              <p style={{ fontSize: 13, color: "#917850", marginTop: 4 }}>
+                Customer:{" "}
+                <strong style={{ color: "#1C1507" }}>
+                  {currentOrder.user?.fullName}
+                </strong>{" "}
+                · {currentOrder.user?.mobile}
               </p>
             </div>
 
             {liveLocation && currentOrder.deliveryAddress?.latitude && (
-              <div style={{ marginTop: 16, borderRadius: 16, overflow: 'hidden' }}>
-                <DeliveryBoyTracking data={{
-                  deliveryBoyLocation: liveLocation,
-                  customerLocation: {
-                    lat: currentOrder.deliveryAddress.latitude,
-                    lon: currentOrder.deliveryAddress.longitude
-                  }
-                }} />
+              <div
+                style={{ marginTop: 16, borderRadius: 16, overflow: "hidden" }}
+              >
+                <DeliveryBoyTracking
+                  data={{
+                    deliveryBoyLocation: liveLocation,
+                    customerLocation: {
+                      lat: currentOrder.deliveryAddress.latitude,
+                      lon: currentOrder.deliveryAddress.longitude,
+                    },
+                  }}
+                />
               </div>
             )}
 
             {!showOtpBox ? (
-              <button className="db-deliver-btn" onClick={sendOtp} disabled={loading}>
-                {loading ? <ClipLoader size={20} color="white" /> : <><FaCheckCircle size={16} />Mark As Delivered</>}
+              <button
+                className="db-deliver-btn"
+                onClick={sendOtp}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ClipLoader size={20} color="white" />
+                ) : (
+                  <>
+                    <FaCheckCircle size={16} />
+                    Mark As Delivered
+                  </>
+                )}
               </button>
             ) : (
               <div className="db-otp-box">
-                <p style={{ fontWeight: 700, fontSize: 14, color: '#1C1507', marginBottom: 4 }}>
-                  Enter OTP sent to <span style={{ color: '#F47B1F' }}>{currentOrder.user?.fullName}</span>
+                <p
+                  style={{
+                    fontWeight: 700,
+                    fontSize: 14,
+                    color: "#1C1507",
+                    marginBottom: 4,
+                  }}
+                >
+                  Enter OTP sent to{" "}
+                  <span style={{ color: "#F47B1F" }}>
+                    {currentOrder.user?.fullName}
+                  </span>
                 </p>
-                <p style={{ fontSize: 12, color: '#917850', marginBottom: 0 }}>Check their registered email/phone</p>
+                <p style={{ fontSize: 12, color: "#917850", marginBottom: 0 }}>
+                  Check their registered email/phone
+                </p>
                 <input
                   type="text"
                   className="db-otp-input"
@@ -245,11 +367,21 @@ function DeliveryBoy() {
                   value={otp}
                 />
                 {message && (
-                  <p style={{ textAlign: 'center', color: '#22c55e', fontWeight: 700, fontSize: 14, marginBottom: 12 }}>
+                  <p
+                    style={{
+                      textAlign: "center",
+                      color: "#22c55e",
+                      fontWeight: 700,
+                      fontSize: 14,
+                      marginBottom: 12,
+                    }}
+                  >
                     ✓ {message}
                   </p>
                 )}
-                <button className="db-submit-btn" onClick={verifyOtp}>Confirm Delivery</button>
+                <button className="db-submit-btn" onClick={verifyOtp}>
+                  Confirm Delivery
+                </button>
               </div>
             )}
           </div>
@@ -258,21 +390,49 @@ function DeliveryBoy() {
         {/* Available Assignments */}
         {!currentOrder && (
           <div className="db-card">
-            <h2 className="db-card-title"><MdAssignment color="#F47B1F" size={22} />Available Orders</h2>
+            <h2 className="db-card-title">
+              <MdAssignment color="#F47B1F" size={22} />
+              Available Orders
+            </h2>
             {availableAssignments.length > 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 12 }}
+              >
                 {availableAssignments.map((a, index) => (
                   <div className="db-assignment" key={index}>
                     <div className="db-assignment-info">
-                      <p style={{ fontWeight: 800, fontSize: 14, color: '#1C1507', marginBottom: 4 }}>{a?.shopName}</p>
-                      <p style={{ fontSize: 13, color: '#917850', display: 'flex', alignItems: 'center', gap: 5 }}>
-                        <MdLocationOn size={13} color="#F47B1F" />{a?.deliveryAddress?.text}
+                      <p
+                        style={{
+                          fontWeight: 800,
+                          fontSize: 14,
+                          color: "#1C1507",
+                          marginBottom: 4,
+                        }}
+                      >
+                        {a?.shopName}
                       </p>
-                      <p style={{ fontSize: 12, color: '#917850', marginTop: 4 }}>
+                      <p
+                        style={{
+                          fontSize: 13,
+                          color: "#917850",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 5,
+                        }}
+                      >
+                        <MdLocationOn size={13} color="#F47B1F" />
+                        {a?.deliveryAddress?.text}
+                      </p>
+                      <p
+                        style={{ fontSize: 12, color: "#917850", marginTop: 4 }}
+                      >
                         {a.items?.length} items · ₹{a.subtotal}
                       </p>
                     </div>
-                    <button className="db-accept-btn" onClick={() => acceptOrder(a.assignmentId)}>
+                    <button
+                      className="db-accept-btn"
+                      onClick={() => acceptOrder(a.assignmentId)}
+                    >
                       Accept
                     </button>
                   </div>
@@ -281,7 +441,11 @@ function DeliveryBoy() {
             ) : (
               <div className="db-empty">
                 <div className="db-empty-icon">🛵</div>
-                <p style={{ fontWeight: 700, color: '#1C1507', marginBottom: 4 }}>No assignments yet</p>
+                <p
+                  style={{ fontWeight: 700, color: "#1C1507", marginBottom: 4 }}
+                >
+                  No assignments yet
+                </p>
                 <p>New orders will appear here automatically</p>
               </div>
             )}
@@ -290,17 +454,37 @@ function DeliveryBoy() {
 
         {/* Today's Deliveries Chart */}
         <div className="db-card">
-          <h2 className="db-card-title"><IoMdTime color="#F47B1F" size={22} />Today's Activity</h2>
+          <h2 className="db-card-title">
+            <IoMdTime color="#F47B1F" size={22} />
+            Today's Activity
+          </h2>
           {todayDeliveries.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={todayDeliveries} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" />
-                <XAxis dataKey="hour" tickFormatter={(h) => `${h}:00`} tick={{ fontSize: 11, fontFamily: 'Outfit', fill: '#917850' }} />
-                <YAxis allowDecimals={false} tick={{ fontSize: 11, fontFamily: 'Outfit', fill: '#917850' }} />
+              <BarChart
+                data={todayDeliveries}
+                margin={{ top: 5, right: 10, left: -20, bottom: 5 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="rgba(0,0,0,0.05)"
+                />
+                <XAxis
+                  dataKey="hour"
+                  tickFormatter={(h) => `${h}:00`}
+                  tick={{ fontSize: 11, fontFamily: "Outfit", fill: "#917850" }}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  tick={{ fontSize: 11, fontFamily: "Outfit", fill: "#917850" }}
+                />
                 <Tooltip
                   formatter={(value) => [value, "Deliveries"]}
-                  labelFormatter={label => `${label}:00`}
-                  contentStyle={{ fontFamily: 'Outfit', borderRadius: 12, border: '1.5px solid rgba(244,123,31,0.2)' }}
+                  labelFormatter={(label) => `${label}:00`}
+                  contentStyle={{
+                    fontFamily: "Outfit",
+                    borderRadius: 12,
+                    border: "1.5px solid rgba(244,123,31,0.2)",
+                  }}
                 />
                 <Bar dataKey="count" fill="#F47B1F" radius={[8, 8, 0, 0]} />
               </BarChart>
@@ -315,15 +499,15 @@ function DeliveryBoy() {
           <div className="db-earning-card">
             <div className="db-earning-label">Total Earnings Today</div>
             <div className="db-earning-amount">₹{totalEarning}</div>
-            <p style={{ fontSize: 12, color: '#917850', marginTop: 6 }}>
-              {totalDeliveriesToday} deliveries × ₹{ratePerDelivery} per delivery
+            <p style={{ fontSize: 12, color: "#917850", marginTop: 6 }}>
+              {totalDeliveriesToday} deliveries × ₹{ratePerDelivery} per
+              delivery
             </p>
           </div>
         </div>
-
       </div>
     </div>
-  )
+  );
 }
 
-export default DeliveryBoy
+export default DeliveryBoy;
