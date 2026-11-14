@@ -1,8 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
-import { MdOutlineTrackChanges } from "react-icons/md"
-import { FaHome, FaCheckCircle, FaClock, FaMotorcycle, FaSmile } from "react-icons/fa"
-import BrandLogo from '../components/BrandLogo'
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { MdOutlineTrackChanges } from "react-icons/md";
+import {
+  FaHome,
+  FaCheckCircle,
+  FaClock,
+  FaMotorcycle,
+  FaSmile,
+} from "react-icons/fa";
+import BrandLogo from "../components/BrandLogo";
 
 const S = `
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
@@ -43,43 +49,96 @@ const S = `
 /* CONFETTI */
 .op-confetti{position:fixed;pointer-events:none;z-index:1000;}
 @keyframes fall{from{opacity:1;transform:translateY(-20px) rotate(0);}to{opacity:0;transform:translateY(110vh) rotate(720deg);}}
-`
+`;
 
 function OrderPlaced() {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const [eta] = useState(Math.floor(Math.random() * 15) + 22)
-  const [confetti, setConfetti] = useState([])
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [eta] = useState(Math.floor(Math.random() * 15) + 22);
+  const [confetti, setConfetti] = useState([]);
 
   // Get order data from navigation state
-  const order = location.state?.order || null
+  const order = location.state?.order || null;
 
   useEffect(() => {
-    setConfetti(Array.from({ length: 24 }, (_, i) => ({
-      id: i, x: Math.random() * 100, delay: Math.random() * 1, size: Math.random() * 9 + 6,
-      color: ['#F47B1F','#FAA040','#22c55e','#3b82f6','#a855f7','#E8620A','#fbbf24'][i % 7],
-      dur: Math.random() * 1.8 + 1.5, shape: Math.random() > 0.5
-    })))
-  }, [])
+    setConfetti(
+      Array.from({ length: 24 }, (_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        delay: Math.random() * 1,
+        size: Math.random() * 9 + 6,
+        color: [
+          "#F47B1F",
+          "#FAA040",
+          "#22c55e",
+          "#3b82f6",
+          "#a855f7",
+          "#E8620A",
+          "#fbbf24",
+        ][i % 7],
+        dur: Math.random() * 1.8 + 1.5,
+        shape: Math.random() > 0.5,
+      })),
+    );
+  }, []);
 
   const steps = [
-    { icon: '✅', bg: 'rgba(34,197,94,0.15)', text: 'Order Confirmed', sub: 'Your order has been received' },
-    { icon: '👨‍🍳', bg: 'rgba(244,123,31,0.15)', text: 'Preparing Your Food', sub: 'Restaurant is cooking' },
-    { icon: '🛵', bg: 'rgba(59,130,246,0.15)', text: 'Out For Delivery', sub: `Estimated ${eta} minutes` },
-  ]
+    {
+      icon: "✅",
+      bg: "rgba(34,197,94,0.15)",
+      text: "Order Confirmed",
+      sub: "Your order has been received",
+    },
+    {
+      icon: "👨‍🍳",
+      bg: "rgba(244,123,31,0.15)",
+      text: "Preparing Your Food",
+      sub: "Restaurant is cooking",
+    },
+    {
+      icon: "🛵",
+      bg: "rgba(59,130,246,0.15)",
+      text: "Out For Delivery",
+      sub: `Estimated ${eta} minutes`,
+    },
+  ];
 
   return (
     <div className="op">
       <style>{S}</style>
-      <div className="op-grid" /><div className="op-orb1" /><div className="op-orb2" />
-      {confetti.map(c => (
-        <div key={c.id} className="op-confetti" style={{ left: `${c.x}%`, top: 0, width: c.size, height: c.size, borderRadius: c.shape ? '50%' : 3, background: c.color, animation: `fall ${c.dur}s ${c.delay}s ease-in infinite` }} />
+      <div className="op-grid" />
+      <div className="op-orb1" />
+      <div className="op-orb2" />
+      {confetti.map((c) => (
+        <div
+          key={c.id}
+          className="op-confetti"
+          style={{
+            left: `${c.x}%`,
+            top: 0,
+            width: c.size,
+            height: c.size,
+            borderRadius: c.shape ? "50%" : 3,
+            background: c.color,
+            animation: `fall ${c.dur}s ${c.delay}s ease-in infinite`,
+          }}
+        />
       ))}
       <div className="op-card">
-        <BrandLogo size="md" theme="light" tagline="Network" style={{ justifyContent: 'center', marginBottom: 32 }} />
-        <div className="op-check"><span className="op-checkmark">✓</span></div>
+        <BrandLogo
+          size="md"
+          theme="light"
+          tagline="Network"
+          style={{ justifyContent: "center", marginBottom: 32 }}
+        />
+        <div className="op-check">
+          <span className="op-checkmark">✓</span>
+        </div>
         <h1 className="op-h1">Order Placed! 🎉</h1>
-        <p className="op-sub">Your food is on its way! Sit back, relax, and get ready for something delicious.</p>
+        <p className="op-sub">
+          Your food is on its way! Sit back, relax, and get ready for something
+          delicious.
+        </p>
 
         <div className="op-eta">
           <div>
@@ -92,27 +151,44 @@ function OrderPlaced() {
         <div className="op-steps">
           {steps.map((s, i) => (
             <div key={i} className="op-step">
-              <div className="op-step-icon" style={{ background: s.bg }}>{s.icon}</div>
-              <div><div className="op-step-text">{s.text}</div><div className="op-step-sub">{s.sub}</div></div>
+              <div className="op-step-icon" style={{ background: s.bg }}>
+                {s.icon}
+              </div>
+              <div>
+                <div className="op-step-text">{s.text}</div>
+                <div className="op-step-sub">{s.sub}</div>
+              </div>
             </div>
           ))}
         </div>
 
         <div className="op-btns">
-          <button className="op-btn primary" onClick={() => navigate('/my-orders')}><MdOutlineTrackChanges size={18} />Track Order</button>
-          <button className="op-btn ghost" onClick={() => {
-            if (order?._id) {
-              navigate(`/invoice/${order._id}`)
-            } else {
-              navigate('/my-orders')
-            }
-          }}>
+          <button
+            className="op-btn primary"
+            onClick={() => navigate("/my-orders")}
+          >
+            <MdOutlineTrackChanges size={18} />
+            Track Order
+          </button>
+          <button
+            className="op-btn ghost"
+            onClick={() => {
+              if (order?._id) {
+                navigate(`/invoice/${order._id}`);
+              } else {
+                navigate("/my-orders");
+              }
+            }}
+          >
             🧾 View Invoice
           </button>
-          <button className="op-btn ghost" onClick={() => navigate('/')}><FaHome size={15} />Back to Home</button>
+          <button className="op-btn ghost" onClick={() => navigate("/")}>
+            <FaHome size={15} />
+            Back to Home
+          </button>
         </div>
       </div>
     </div>
-  )
+  );
 }
-export default OrderPlaced
+export default OrderPlaced;

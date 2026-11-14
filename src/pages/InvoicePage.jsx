@@ -1,11 +1,17 @@
-import React, { useRef, useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { FaHome, FaDownload, FaCheckCircle, FaClock, FaPrint } from 'react-icons/fa'
-import { MdOutlineTrackChanges } from 'react-icons/md'
-import axios from 'axios'
-import { serverUrl } from '../App'
-import { ClipLoader } from 'react-spinners'
-import BrandLogo from '../components/BrandLogo'
+import React, { useRef, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  FaHome,
+  FaDownload,
+  FaCheckCircle,
+  FaClock,
+  FaPrint,
+} from "react-icons/fa";
+import { MdOutlineTrackChanges } from "react-icons/md";
+import axios from "axios";
+import { serverUrl } from "../App";
+import { ClipLoader } from "react-spinners";
+import BrandLogo from "../components/BrandLogo";
 
 /* ─── Same design tokens as OrderPlaced.jsx ─── */
 const S = `
@@ -139,16 +145,23 @@ const S = `
   .inv-footer{margin-bottom:0!important;}
   .no-print{display:none!important;}
 }
-`
+`;
 
 /* ─── Helpers ─── */
 const formatDate = (d) => {
-  const date = d ? new Date(d) : new Date()
-  return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) +
-    '  •  ' + date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
-}
+  const date = d ? new Date(d) : new Date();
+  return (
+    date.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }) +
+    "  •  " +
+    date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
+  );
+};
 
-const rupee = (n) => `₹${Number(n || 0).toFixed(2)}`
+const rupee = (n) => `₹${Number(n || 0).toFixed(2)}`;
 
 /* ════════════════════════════════════════════
    InvoicePage Component
@@ -157,39 +170,42 @@ const rupee = (n) => `₹${Number(n || 0).toFixed(2)}`
    Fetches invoice from backend API
 */
 function InvoicePage() {
-  const navigate = useNavigate()
-  const { orderId } = useParams()
-  const cardRef = useRef(null)
+  const navigate = useNavigate();
+  const { orderId } = useParams();
+  const cardRef = useRef(null);
 
-  const [invoice, setInvoice] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [invoice, setInvoice] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   /* ── Fetch invoice from backend ── */
   useEffect(() => {
     const fetchInvoice = async () => {
       try {
-        setLoading(true)
-        setError(null)
-        const res = await axios.get(`${serverUrl}/api/invoice/by-order/${orderId}`, { withCredentials: true })
-        setInvoice(res.data)
+        setLoading(true);
+        setError(null);
+        const res = await axios.get(
+          `${serverUrl}/api/invoice/by-order/${orderId}`,
+          { withCredentials: true },
+        );
+        setInvoice(res.data);
       } catch (err) {
-        console.log('Invoice fetch error:', err)
-        setError(err.response?.data?.message || 'Failed to load invoice')
+        console.log("Invoice fetch error:", err);
+        setError(err.response?.data?.message || "Failed to load invoice");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
     if (orderId) {
-      fetchInvoice()
+      fetchInvoice();
     } else {
-      setError('No order ID provided')
-      setLoading(false)
+      setError("No order ID provided");
+      setLoading(false);
     }
-  }, [orderId])
+  }, [orderId]);
 
-  const handlePrint = () => window.print()
+  const handlePrint = () => window.print();
 
   /* ── Loading State ── */
   if (loading) {
@@ -204,7 +220,7 @@ function InvoicePage() {
           <div className="inv-loading-text">Loading invoice...</div>
         </div>
       </div>
-    )
+    );
   }
 
   /* ── Error State ── */
@@ -218,25 +234,30 @@ function InvoicePage() {
         <div className="inv-error">
           <div className="inv-error-icon">📄</div>
           <div className="inv-error-title">Invoice Not Found</div>
-          <div className="inv-error-sub">{error || 'Could not load the invoice. Please try again.'}</div>
+          <div className="inv-error-sub">
+            {error || "Could not load the invoice. Please try again."}
+          </div>
           <div className="op-btns">
-            <button className="op-btn primary" onClick={() => navigate('/my-orders')}>
+            <button
+              className="op-btn primary"
+              onClick={() => navigate("/my-orders")}
+            >
               <MdOutlineTrackChanges size={16} /> My Orders
             </button>
-            <button className="op-btn outline" onClick={() => navigate('/')}>
+            <button className="op-btn outline" onClick={() => navigate("/")}>
               <FaHome size={13} /> Home
             </button>
           </div>
         </div>
       </div>
-    )
+    );
   }
 
-  const isCOD = invoice.paymentMethod === 'cod'
-  const isPaid = invoice.paymentStatus === 'paid'
+  const isCOD = invoice.paymentMethod === "cod";
+  const isPaid = invoice.paymentStatus === "paid";
 
   // Get the status banner class
-  const bannerClass = isCOD ? (isPaid ? 'cod-paid' : 'cod') : 'online'
+  const bannerClass = isCOD ? (isPaid ? "cod-paid" : "cod") : "online";
 
   return (
     <div className="inv">
@@ -246,15 +267,19 @@ function InvoicePage() {
       <div className="inv-orb2" />
 
       <div className="inv-card" ref={cardRef}>
-
         {/* ── Logo ── */}
-        <BrandLogo size="sm" theme="light" tagline="Network" style={{ justifyContent: 'center', marginBottom: 4 }} />
+        <BrandLogo
+          size="sm"
+          theme="light"
+          tagline="Network"
+          style={{ justifyContent: "center", marginBottom: 4 }}
+        />
 
         {/* ── Invoice Header ── */}
         <div className="inv-title-row">
           <div className="inv-title">Invoice</div>
-          <span className={`inv-badge ${isPaid ? 'paid' : 'pending'}`}>
-            {isPaid ? '✓ Paid' : '⏳ Pending'}
+          <span className={`inv-badge ${isPaid ? "paid" : "pending"}`}>
+            {isPaid ? "✓ Paid" : "⏳ Pending"}
           </span>
         </div>
         <div className="inv-meta">
@@ -267,29 +292,59 @@ function InvoicePage() {
         <div className="inv-info-grid">
           <div className="inv-info-box">
             <div className="inv-info-label">Customer</div>
-            <div className="inv-info-value">{invoice.customerName || 'Customer'}</div>
-            {invoice.customerEmail && <div className="inv-info-value" style={{ fontSize: 11, color: '#917850' }}>{invoice.customerEmail}</div>}
-            {invoice.customerMobile && <div className="inv-info-value" style={{ fontSize: 11, color: '#917850' }}>{invoice.customerMobile}</div>}
+            <div className="inv-info-value">
+              {invoice.customerName || "Customer"}
+            </div>
+            {invoice.customerEmail && (
+              <div
+                className="inv-info-value"
+                style={{ fontSize: 11, color: "#917850" }}
+              >
+                {invoice.customerEmail}
+              </div>
+            )}
+            {invoice.customerMobile && (
+              <div
+                className="inv-info-value"
+                style={{ fontSize: 11, color: "#917850" }}
+              >
+                {invoice.customerMobile}
+              </div>
+            )}
           </div>
           <div className="inv-info-box">
             <div className="inv-info-label">Delivery Address</div>
-            <div className="inv-info-value">{invoice.deliveryAddress?.text || 'Address on file'}</div>
+            <div className="inv-info-value">
+              {invoice.deliveryAddress?.text || "Address on file"}
+            </div>
           </div>
           <div className="inv-info-box">
             <div className="inv-info-label">Payment Method</div>
-            <div className="inv-info-value">{isCOD ? '💵 Cash on Delivery' : '💳 Online Payment'}</div>
+            <div className="inv-info-value">
+              {isCOD ? "💵 Cash on Delivery" : "💳 Online Payment"}
+            </div>
           </div>
           <div className="inv-info-box">
             <div className="inv-info-label">Invoice No.</div>
-            <div className="inv-info-value" style={{ fontSize: 12, letterSpacing: '0.5px' }}>{invoice.invoiceNumber}</div>
-            <div className="inv-info-value" style={{ fontSize: 10, color: '#C49A6C', marginTop: 2 }}>Order: #{orderId?.slice(-8).toUpperCase()}</div>
+            <div
+              className="inv-info-value"
+              style={{ fontSize: 12, letterSpacing: "0.5px" }}
+            >
+              {invoice.invoiceNumber}
+            </div>
+            <div
+              className="inv-info-value"
+              style={{ fontSize: 10, color: "#C49A6C", marginTop: 2 }}
+            >
+              Order: #{orderId?.slice(-8).toUpperCase()}
+            </div>
           </div>
         </div>
 
         {/* ── Payment Status Banner ── */}
         <div className={`inv-status-banner ${bannerClass}`}>
           <div className={`inv-status-icon ${bannerClass}`}>
-            {isPaid ? '✅' : '💵'}
+            {isPaid ? "✅" : "💵"}
           </div>
           <div>
             {isCOD ? (
@@ -297,22 +352,26 @@ function InvoicePage() {
                 <>
                   <div className="inv-status-title">Payment Collected ✓</div>
                   <div className="inv-status-sub">
-                    Cash collected by delivery partner on {invoice.paidAt ? formatDate(invoice.paidAt) : 'delivery'}
+                    Cash collected by delivery partner on{" "}
+                    {invoice.paidAt ? formatDate(invoice.paidAt) : "delivery"}
                   </div>
                 </>
               ) : (
                 <>
                   <div className="inv-status-title">Cash on Delivery</div>
                   <div className="inv-status-sub">
-                    Please keep exact change ready. Pay to delivery partner on arrival.
+                    Please keep exact change ready. Pay to delivery partner on
+                    arrival.
                   </div>
                 </>
               )
             ) : (
               <>
-                <div className="inv-status-title">Online Payment Successful</div>
+                <div className="inv-status-title">
+                  Online Payment Successful
+                </div>
                 <div className="inv-status-sub">
-                  Payment ID: {invoice.razorpayPaymentId || 'Verified'}
+                  Payment ID: {invoice.razorpayPaymentId || "Verified"}
                 </div>
               </>
             )}
@@ -324,8 +383,8 @@ function InvoicePage() {
         <div className="inv-items">
           <div className="inv-items-header">
             <span>Item</span>
-            <span style={{ textAlign: 'center' }}>Qty</span>
-            <span style={{ textAlign: 'right' }}>Price</span>
+            <span style={{ textAlign: "center" }}>Qty</span>
+            <span style={{ textAlign: "right" }}>Price</span>
           </div>
 
           {(invoice.shopOrders || []).map((shopOrder, si) => (
@@ -335,11 +394,15 @@ function InvoicePage() {
                   <div>
                     <div className="inv-item-name">{item.name}</div>
                     {shopOrder.shopName && (
-                      <div className="inv-item-shop">🏪 {shopOrder.shopName}</div>
+                      <div className="inv-item-shop">
+                        🏪 {shopOrder.shopName}
+                      </div>
                     )}
                   </div>
                   <div className="inv-item-qty">×{item.quantity}</div>
-                  <div className="inv-item-price">{rupee(item.total || item.price * item.quantity)}</div>
+                  <div className="inv-item-price">
+                    {rupee(item.total || item.price * item.quantity)}
+                  </div>
                 </div>
               ))}
             </React.Fragment>
@@ -354,8 +417,15 @@ function InvoicePage() {
           </div>
           <div className="inv-total-row">
             <span className="inv-total-label">Delivery Fee</span>
-            <span className="inv-total-value" style={{ color: invoice.deliveryFee === 0 ? '#22c55e' : undefined }}>
-              {invoice.deliveryFee === 0 ? '🎉 FREE' : rupee(invoice.deliveryFee)}
+            <span
+              className="inv-total-value"
+              style={{
+                color: invoice.deliveryFee === 0 ? "#22c55e" : undefined,
+              }}
+            >
+              {invoice.deliveryFee === 0
+                ? "🎉 FREE"
+                : rupee(invoice.deliveryFee)}
             </span>
           </div>
           <div className="inv-total-row">
@@ -364,7 +434,9 @@ function InvoicePage() {
           </div>
           <div className="inv-total-row grand">
             <span className="inv-total-label">Total Amount</span>
-            <span className="inv-total-value">{rupee(invoice.totalAmount)}</span>
+            <span className="inv-total-value">
+              {rupee(invoice.totalAmount)}
+            </span>
           </div>
         </div>
 
@@ -374,9 +446,12 @@ function InvoicePage() {
             <span className="inv-cod-note-icon">📋</span>
             <div className="inv-cod-note-text">
               <strong>This is a Proforma Invoice</strong>
-              Payment of <strong style={{ display: 'inline', color: '#F47B1F' }}>{rupee(invoice.totalAmount)}</strong> is due at delivery.
-              Your delivery partner will carry a copy of this invoice.
-              Please pay in cash upon receipt of your order.
+              Payment of{" "}
+              <strong style={{ display: "inline", color: "#F47B1F" }}>
+                {rupee(invoice.totalAmount)}
+              </strong>{" "}
+              is due at delivery. Your delivery partner will carry a copy of
+              this invoice. Please pay in cash upon receipt of your order.
             </div>
           </div>
         )}
@@ -386,15 +461,16 @@ function InvoicePage() {
           <div className="inv-paid-stamp">
             <span className="inv-paid-stamp-icon">✅</span>
             <div className="inv-paid-stamp-text">
-              Payment of {rupee(invoice.totalAmount)} has been collected successfully.
-              This invoice is fully settled.
+              Payment of {rupee(invoice.totalAmount)} has been collected
+              successfully. This invoice is fully settled.
             </div>
           </div>
         )}
 
         {/* ── Footer ── */}
         <div className="inv-footer">
-          Thank you for ordering with Pakwan Network 🍽️<br />
+          Thank you for ordering with Pakwan Network 🍽️
+          <br />
           For support: support@pakwannetwork.com &nbsp;·&nbsp; +91 98765 43210
         </div>
 
@@ -403,17 +479,19 @@ function InvoicePage() {
           <button className="op-btn primary" onClick={handlePrint}>
             <FaPrint size={14} /> Print Invoice
           </button>
-          <button className="op-btn ghost" onClick={() => navigate('/my-orders')}>
+          <button
+            className="op-btn ghost"
+            onClick={() => navigate("/my-orders")}
+          >
             <MdOutlineTrackChanges size={16} /> My Orders
           </button>
-          <button className="op-btn outline" onClick={() => navigate('/')}>
+          <button className="op-btn outline" onClick={() => navigate("/")}>
             <FaHome size={13} /> Home
           </button>
         </div>
-
       </div>
     </div>
-  )
+  );
 }
 
-export default InvoicePage
+export default InvoicePage;

@@ -1,10 +1,18 @@
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import { serverUrl } from '../App'
-import { useNavigate, useParams } from 'react-router-dom'
-import { FaStore, FaUtensils, FaArrowLeft, FaMapMarkerAlt, FaStar, FaClock, FaFireAlt } from "react-icons/fa"
-import FoodCard from '../components/FoodCard'
-import Nav from '../components/Nav'
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { serverUrl } from "../App";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  FaStore,
+  FaUtensils,
+  FaArrowLeft,
+  FaMapMarkerAlt,
+  FaStar,
+  FaClock,
+  FaFireAlt,
+} from "react-icons/fa";
+import FoodCard from "../components/FoodCard";
+import Nav from "../components/Nav";
 
 const S = `
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Outfit:wght@400;500;600;700;800&display=swap');
@@ -44,28 +52,35 @@ const S = `
 .sp-info-val{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:#F47B1F;}
 .sp-info-label{font-size:11px;color:#917850;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;}
 @media(max-width:768px){.sp-grid{justify-content:center;}.sp-hero{height:320px;}.sp-info-cards{gap:10px;}}
-`
+`;
 
 function Shop() {
-  const { shopId } = useParams()
-  const [items, setItems] = useState([])
-  const [shop, setShop] = useState(null)
-  const [filter, setFilter] = useState('All')
-  const navigate = useNavigate()
+  const { shopId } = useParams();
+  const [items, setItems] = useState([]);
+  const [shop, setShop] = useState(null);
+  const [filter, setFilter] = useState("All");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const load = async () => {
       try {
-        const r = await axios.get(`${serverUrl}/api/item/get-by-shop/${shopId}`, { withCredentials: true })
-        setShop(r.data.shop); setItems(r.data.items)
-      } catch (e) { console.log(e) }
-    }
-    load()
-  }, [shopId])
+        const r = await axios.get(
+          `${serverUrl}/api/item/get-by-shop/${shopId}`,
+          { withCredentials: true },
+        );
+        setShop(r.data.shop);
+        setItems(r.data.items);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    load();
+  }, [shopId]);
 
-  const cats = ['All', ...new Set(items.map(i => i.category))]
-  const filtered = filter === 'All' ? items : items.filter(i => i.category === filter)
-  const avgRating = items.length ? 4.5 : null
+  const cats = ["All", ...new Set(items.map((i) => i.category))];
+  const filtered =
+    filter === "All" ? items : items.filter((i) => i.category === filter);
+  const avgRating = items.length ? 4.5 : null;
 
   return (
     <div className="sp">
@@ -75,16 +90,36 @@ function Shop() {
         <div className="sp-hero">
           <img src={shop.image} alt={shop.name} />
           <div className="sp-overlay" />
-          <button className="sp-back" onClick={() => navigate('/')}><FaArrowLeft size={13} />Back</button>
+          <button className="sp-back" onClick={() => navigate("/")}>
+            <FaArrowLeft size={13} />
+            Back
+          </button>
           <div className="sp-hero-bottom">
             <div className="sp-hero-inner">
-              <div className="sp-restaurant-badge"><FaStore size={10} />Restaurant</div>
+              <div className="sp-restaurant-badge">
+                <FaStore size={10} />
+                Restaurant
+              </div>
               <h1 className="sp-title">{shop.name}</h1>
               <div className="sp-meta">
-                <div className="sp-meta-item"><FaMapMarkerAlt size={13} color="#F47B1F" />{shop.address}, {shop.city}</div>
-                {avgRating && <div className="sp-rating-badge"><FaStar size={12} />{avgRating} rating</div>}
-                <div className="sp-meta-item"><FaClock size={12} color="#FAA040" />25–35 min</div>
-                <div className="sp-meta-item"><FaFireAlt size={12} color="#FAA040" />{items.length} dishes</div>
+                <div className="sp-meta-item">
+                  <FaMapMarkerAlt size={13} color="#F47B1F" />
+                  {shop.address}, {shop.city}
+                </div>
+                {avgRating && (
+                  <div className="sp-rating-badge">
+                    <FaStar size={12} />
+                    {avgRating} rating
+                  </div>
+                )}
+                <div className="sp-meta-item">
+                  <FaClock size={12} color="#FAA040" />
+                  25–35 min
+                </div>
+                <div className="sp-meta-item">
+                  <FaFireAlt size={12} color="#FAA040" />
+                  {items.length} dishes
+                </div>
               </div>
             </div>
           </div>
@@ -94,7 +129,12 @@ function Shop() {
       <div className="sp-content">
         {/* Info Cards */}
         <div className="sp-info-cards">
-          {[{ v: `${items.length}`, l: 'Menu Items' }, { v: '₹200+', l: 'Min Order' }, { v: '25 min', l: 'Delivery' }, { v: '4.5★', l: 'Rating' }].map(c => (
+          {[
+            { v: `${items.length}`, l: "Menu Items" },
+            { v: "₹200+", l: "Min Order" },
+            { v: "25 min", l: "Delivery" },
+            { v: "4.5★", l: "Rating" },
+          ].map((c) => (
             <div key={c.l} className="sp-info-card">
               <div className="sp-info-val">{c.v}</div>
               <div className="sp-info-label">{c.l}</div>
@@ -104,32 +144,68 @@ function Shop() {
 
         <div className="sp-content-hd">
           <div>
-            <div className="sp-menu-title"><FaUtensils color="#F47B1F" size={20} style={{ marginRight: 10, verticalAlign: 'middle' }} />Our <span>Menu</span></div>
+            <div className="sp-menu-title">
+              <FaUtensils
+                color="#F47B1F"
+                size={20}
+                style={{ marginRight: 10, verticalAlign: "middle" }}
+              />
+              Our <span>Menu</span>
+            </div>
           </div>
-          <div style={{ fontSize: 13, color: '#917850', fontWeight: 600 }}>{filtered.length} items</div>
+          <div style={{ fontSize: 13, color: "#917850", fontWeight: 600 }}>
+            {filtered.length} items
+          </div>
         </div>
 
         <div className="sp-filter-bar">
-          {cats.map(c => (
-            <button key={c} className="sp-filter" onClick={() => setFilter(c)}
-              style={{ background: filter === c ? 'linear-gradient(135deg,#F47B1F,#E8620A)' : 'white', color: filter === c ? 'white' : '#917850', borderColor: filter === c ? '#F47B1F' : 'rgba(0,0,0,0.1)', boxShadow: filter === c ? '0 4px 16px rgba(244,123,31,0.35)' : 'none' }}>
+          {cats.map((c) => (
+            <button
+              key={c}
+              className="sp-filter"
+              onClick={() => setFilter(c)}
+              style={{
+                background:
+                  filter === c
+                    ? "linear-gradient(135deg,#F47B1F,#E8620A)"
+                    : "white",
+                color: filter === c ? "white" : "#917850",
+                borderColor: filter === c ? "#F47B1F" : "rgba(0,0,0,0.1)",
+                boxShadow:
+                  filter === c ? "0 4px 16px rgba(244,123,31,0.35)" : "none",
+              }}
+            >
               {c}
             </button>
           ))}
         </div>
 
         <div className="sp-grid">
-          {filtered.map((item, i) => <FoodCard key={i} data={item} />)}
+          {filtered.map((item, i) => (
+            <FoodCard key={i} data={item} />
+          ))}
           {filtered.length === 0 && (
             <div className="sp-empty">
               <div style={{ fontSize: 52, marginBottom: 14 }}>🍽️</div>
-              <div style={{ fontFamily: "'Fraunces',serif", fontSize: 20, fontWeight: 700, color: '#1C1507', marginBottom: 8 }}>No items in this category</div>
-              <div style={{ fontSize: 14, color: '#917850' }}>Try selecting a different category above</div>
+              <div
+                style={{
+                  fontFamily: "'Fraunces',serif",
+                  fontSize: 20,
+                  fontWeight: 700,
+                  color: "#1C1507",
+                  marginBottom: 8,
+                }}
+              >
+                No items in this category
+              </div>
+              <div style={{ fontSize: 14, color: "#917850" }}>
+                Try selecting a different category above
+              </div>
             </div>
           )}
         </div>
       </div>
     </div>
-  )
+  );
 }
-export default Shop
+export default Shop;
