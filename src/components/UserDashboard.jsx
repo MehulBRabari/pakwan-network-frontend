@@ -1,11 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react'
-import Nav from './Nav'
-import { categories } from '../category'
-import { FaCircleChevronLeft, FaCircleChevronRight, FaFire, FaStar, FaMapPin } from "react-icons/fa6"
-import { useSelector } from 'react-redux'
-import FoodCard from './FoodCard'
-import { useNavigate } from 'react-router-dom'
-import { IoIosSearch } from 'react-icons/io'
+import React, { useEffect, useRef, useState } from "react";
+import Nav from "./Nav";
+import { categories } from "../category";
+import {
+  FaCircleChevronLeft,
+  FaCircleChevronRight,
+  FaFire,
+  FaStar,
+  FaMapPin,
+} from "react-icons/fa6";
+import { useSelector } from "react-redux";
+import FoodCard from "./FoodCard";
+import { useNavigate } from "react-router-dom";
+import { IoIosSearch } from "react-icons/io";
 
 const S = `
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
@@ -125,35 +131,71 @@ const S = `
   .ud-stats-row{gap:18px;}
   .ud-offer{flex-direction:column;gap:16px;text-align:center;}
 }
-`
+`;
 
 function UserDashboard() {
-  const { currentCity, shopInMyCity, itemsInMyCity, searchItems } = useSelector(s => s.user)
-  const cateRef = useRef(); const shopRef = useRef()
-  const navigate = useNavigate()
-  const [catLeft, setCatLeft] = useState(false); const [catRight, setCatRight] = useState(false)
-  const [shopLeft, setShopLeft] = useState(false); const [shopRight, setShopRight] = useState(false)
-  const [items, setItems] = useState([])
-  const [activeFilter, setActiveFilter] = useState('All')
-  const [searchQ, setSearchQ] = useState('')
-  const dispatch = useSelector(s => s.user) // just to get dispatch
-  const reduxDispatch = React.useReducer(null, null)[1]
+  const { currentCity, shopInMyCity, itemsInMyCity, searchItems } = useSelector(
+    (s) => s.user,
+  );
+  const cateRef = useRef();
+  const shopRef = useRef();
+  const navigate = useNavigate();
+  const [catLeft, setCatLeft] = useState(false);
+  const [catRight, setCatRight] = useState(false);
+  const [shopLeft, setShopLeft] = useState(false);
+  const [shopRight, setShopRight] = useState(false);
+  const [items, setItems] = useState([]);
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [searchQ, setSearchQ] = useState("");
+  const dispatch = useSelector((s) => s.user); // just to get dispatch
+  const reduxDispatch = React.useReducer(null, null)[1];
 
-  const handleFilter = cat => {
-    setActiveFilter(cat)
-    setItems(cat === 'All' ? itemsInMyCity : itemsInMyCity?.filter(i => i.category === cat))
-  }
-  useEffect(() => { setItems(itemsInMyCity) }, [itemsInMyCity])
+  const handleFilter = (cat) => {
+    setActiveFilter(cat);
+    setItems(
+      cat === "All"
+        ? itemsInMyCity
+        : itemsInMyCity?.filter((i) => i.category === cat),
+    );
+  };
+  useEffect(() => {
+    setItems(itemsInMyCity);
+  }, [itemsInMyCity]);
 
-  const upd = (ref, setL, setR) => { const el = ref.current; if (el) { setL(el.scrollLeft > 0); setR(el.scrollLeft + el.clientWidth < el.scrollWidth) } }
-  const scrl = (ref, dir) => ref.current?.scrollBy({ left: dir === 'left' ? -230 : 230, behavior: 'smooth' })
+  const upd = (ref, setL, setR) => {
+    const el = ref.current;
+    if (el) {
+      setL(el.scrollLeft > 0);
+      setR(el.scrollLeft + el.clientWidth < el.scrollWidth);
+    }
+  };
+  const scrl = (ref, dir) =>
+    ref.current?.scrollBy({
+      left: dir === "left" ? -230 : 230,
+      behavior: "smooth",
+    });
 
   useEffect(() => {
-    const pairs = [[cateRef, setCatLeft, setCatRight], [shopRef, setShopLeft, setShopRight]]
-    const hs = pairs.map(([r, l, ri]) => () => upd(r, l, ri))
-    pairs.forEach(([r, l, ri], i) => { if (r.current) { upd(r, l, ri); r.current.addEventListener('scroll', hs[i]) } })
-    return () => pairs.forEach(([r], i) => r?.current?.removeEventListener('scroll', hs[i]))
-  }, [shopInMyCity])
+    const pairs = [
+      [cateRef, setCatLeft, setCatRight],
+      [shopRef, setShopLeft, setShopRight],
+    ];
+    const hs = pairs.map(
+      ([r, l, ri]) =>
+        () =>
+          upd(r, l, ri),
+    );
+    pairs.forEach(([r, l, ri], i) => {
+      if (r.current) {
+        upd(r, l, ri);
+        r.current.addEventListener("scroll", hs[i]);
+      }
+    });
+    return () =>
+      pairs.forEach(([r], i) =>
+        r?.current?.removeEventListener("scroll", hs[i]),
+      );
+  }, [shopInMyCity]);
 
   return (
     <div className="ud">
@@ -163,41 +205,92 @@ function UserDashboard() {
       {/* HERO */}
       <section className="ud-hero">
         <div className="ud-hero-grid" />
-        <div className="ud-hero-orb" style={{ top: '-10%', right: '-5%', width: 500, height: 500, background: 'radial-gradient(circle,rgba(244,123,31,0.2),transparent 65%)' }} />
-        <div className="ud-hero-orb" style={{ bottom: '-15%', left: '15%', width: 280, height: 280, background: 'radial-gradient(circle,rgba(250,160,64,0.12),transparent 65%)' }} />
+        <div
+          className="ud-hero-orb"
+          style={{
+            top: "-10%",
+            right: "-5%",
+            width: 500,
+            height: 500,
+            background:
+              "radial-gradient(circle,rgba(244,123,31,0.2),transparent 65%)",
+          }}
+        />
+        <div
+          className="ud-hero-orb"
+          style={{
+            bottom: "-15%",
+            left: "15%",
+            width: 280,
+            height: 280,
+            background:
+              "radial-gradient(circle,rgba(250,160,64,0.12),transparent 65%)",
+          }}
+        />
         <div className="ud-hero-content">
           <div className="ud-badge">
             <span className="ud-badge-dot" />
             <FaMapPin size={10} color="#FAA040" />
-            {currentCity || 'Detecting location...'}
+            {currentCity || "Detecting location..."}
           </div>
           <h1 className="ud-title">
-            What's on your<br />
+            What's on your
+            <br />
             <span>plate today?</span>
           </h1>
           <p className="ud-sub">
-            {itemsInMyCity?.length || 0}+ dishes from {shopInMyCity?.length || 0} restaurants. Delivered in 25 minutes.
+            {itemsInMyCity?.length || 0}+ dishes from{" "}
+            {shopInMyCity?.length || 0} restaurants. Delivered in 25 minutes.
           </p>
           <div className="ud-hero-search">
-            <input placeholder="Search biryani, pizza, sushi..." value={searchQ} onChange={e => setSearchQ(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter' && searchQ.trim()) {
-                  const filtered = itemsInMyCity?.filter(i => i.name.toLowerCase().includes(searchQ.toLowerCase()) || i.category.toLowerCase().includes(searchQ.toLowerCase()))
-                  setItems(filtered); setActiveFilter('Search')
+            <input
+              placeholder="Search biryani, pizza, sushi..."
+              value={searchQ}
+              onChange={(e) => setSearchQ(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && searchQ.trim()) {
+                  const filtered = itemsInMyCity?.filter(
+                    (i) =>
+                      i.name.toLowerCase().includes(searchQ.toLowerCase()) ||
+                      i.category.toLowerCase().includes(searchQ.toLowerCase()),
+                  );
+                  setItems(filtered);
+                  setActiveFilter("Search");
                 }
-              }} />
-            <button className="ud-hero-search-btn" onClick={() => {
-              if (searchQ.trim()) {
-                const filtered = itemsInMyCity?.filter(i => i.name.toLowerCase().includes(searchQ.toLowerCase()) || i.category.toLowerCase().includes(searchQ.toLowerCase()))
-                setItems(filtered); setActiveFilter('Search')
-              } else { setItems(itemsInMyCity); setActiveFilter('All') }
-            }}>
-              <IoIosSearch size={18} />Search
+              }}
+            />
+            <button
+              className="ud-hero-search-btn"
+              onClick={() => {
+                if (searchQ.trim()) {
+                  const filtered = itemsInMyCity?.filter(
+                    (i) =>
+                      i.name.toLowerCase().includes(searchQ.toLowerCase()) ||
+                      i.category.toLowerCase().includes(searchQ.toLowerCase()),
+                  );
+                  setItems(filtered);
+                  setActiveFilter("Search");
+                } else {
+                  setItems(itemsInMyCity);
+                  setActiveFilter("All");
+                }
+              }}
+            >
+              <IoIosSearch size={18} />
+              Search
             </button>
           </div>
           <div className="ud-stats-row">
-            {[{ v: `${shopInMyCity?.length || 0}+`, l: 'Restaurants' }, { v: `${itemsInMyCity?.length || 0}+`, l: 'Dishes' }, { v: '25 min', l: 'Avg Delivery' }, { v: '4.8★', l: 'Avg Rating' }].map(s => (
-              <div className="ud-stat-item" key={s.l}><div className="ud-stat-v">{s.v}</div><div className="ud-stat-l">{s.l}</div></div>
+            {[
+              { v: `${shopInMyCity?.length || 0}+`, l: "Restaurants" },
+              { v: `${itemsInMyCity?.length || 0}+`, l: "Dishes" },
+              { v: "25 min", l: "Avg Delivery" },
+              { v: "4.8★", l: "Avg Rating" },
+            ].map((s) => (
+              <div className="ud-stat-item" key={s.l}>
+                <div className="ud-stat-v">{s.v}</div>
+                <div className="ud-stat-l">{s.l}</div>
+              </div>
             ))}
           </div>
         </div>
@@ -209,58 +302,174 @@ function UserDashboard() {
           <div className="ud-search-bar">
             <div className="ud-sec-hd" style={{ marginBottom: 16 }}>
               <div>
-                <div className="ud-sec-title" style={{ fontSize: '1.3rem' }}>Search Results</div>
-                <div className="ud-sec-sub">{searchItems.length} dishes found</div>
+                <div className="ud-sec-title" style={{ fontSize: "1.3rem" }}>
+                  Search Results
+                </div>
+                <div className="ud-sec-sub">
+                  {searchItems.length} dishes found
+                </div>
               </div>
             </div>
-            <div className="ud-food-grid">{searchItems.map(item => <FoodCard data={item} key={item._id} />)}</div>
+            <div className="ud-food-grid">
+              {searchItems.map((item) => (
+                <FoodCard data={item} key={item._id} />
+              ))}
+            </div>
           </div>
         )}
 
         {/* Offer Banner */}
         <div className="ud-offer">
-          <div className="ud-offer-orb" style={{ top: '-30%', right: '10%', width: 280, height: 280, background: 'radial-gradient(circle,rgba(244,123,31,0.2),transparent 65%)' }} />
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'rgba(244,123,31,0.2)', border: '1px solid rgba(244,123,31,0.35)', borderRadius: 50, padding: '4px 14px', fontSize: 11, color: '#FAA040', fontWeight: 800, marginBottom: 12, letterSpacing: 0.5 }}>🎉 LIMITED TIME OFFER</div>
-            <div style={{ fontFamily: "'Fraunces',serif", fontSize: 'clamp(1.4rem,3vw,2rem)', fontWeight: 700, color: '#FAFAF8', letterSpacing: -0.5, marginBottom: 8 }}>Free delivery on<br /><span style={{ color: '#F47B1F' }}>orders above ₹500</span></div>
-            <div style={{ fontSize: 13, color: 'rgba(250,250,248,0.5)' }}>Use code PAKWAN50 for 50% off your first order</div>
+          <div
+            className="ud-offer-orb"
+            style={{
+              top: "-30%",
+              right: "10%",
+              width: 280,
+              height: 280,
+              background:
+                "radial-gradient(circle,rgba(244,123,31,0.2),transparent 65%)",
+            }}
+          />
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 7,
+                background: "rgba(244,123,31,0.2)",
+                border: "1px solid rgba(244,123,31,0.35)",
+                borderRadius: 50,
+                padding: "4px 14px",
+                fontSize: 11,
+                color: "#FAA040",
+                fontWeight: 800,
+                marginBottom: 12,
+                letterSpacing: 0.5,
+              }}
+            >
+              🎉 LIMITED TIME OFFER
+            </div>
+            <div
+              style={{
+                fontFamily: "'Fraunces',serif",
+                fontSize: "clamp(1.4rem,3vw,2rem)",
+                fontWeight: 700,
+                color: "#FAFAF8",
+                letterSpacing: -0.5,
+                marginBottom: 8,
+              }}
+            >
+              Free delivery on
+              <br />
+              <span style={{ color: "#F47B1F" }}>orders above ₹500</span>
+            </div>
+            <div style={{ fontSize: 13, color: "rgba(250,250,248,0.5)" }}>
+              Use code PAKWAN50 for 50% off your first order
+            </div>
           </div>
-          <div style={{ position: 'relative', zIndex: 1, fontSize: 72, filter: 'drop-shadow(0 8px 24px rgba(244,123,31,0.4))' }}>🛵</div>
+          <div
+            style={{
+              position: "relative",
+              zIndex: 1,
+              fontSize: 72,
+              filter: "drop-shadow(0 8px 24px rgba(244,123,31,0.4))",
+            }}
+          >
+            🛵
+          </div>
         </div>
 
         {/* Categories */}
         <div className="ud-section">
           <div className="ud-sec-hd">
             <div>
-              <div className="ud-sec-title">Browse <span>Categories</span></div>
-              <div className="ud-sec-sub">{categories.length} cuisines available</div>
+              <div className="ud-sec-title">
+                Browse <span>Categories</span>
+              </div>
+              <div className="ud-sec-sub">
+                {categories.length} cuisines available
+              </div>
             </div>
           </div>
           <div className="ud-filters">
-            <button className="ud-filter" onClick={() => handleFilter('All')}
-              style={{ background: activeFilter === 'All' ? 'linear-gradient(135deg,#F47B1F,#E8620A)' : 'white', color: activeFilter === 'All' ? 'white' : '#917850', borderColor: activeFilter === 'All' ? '#F47B1F' : 'rgba(0,0,0,0.1)', boxShadow: activeFilter === 'All' ? '0 4px 16px rgba(244,123,31,0.35)' : 'none' }}>
+            <button
+              className="ud-filter"
+              onClick={() => handleFilter("All")}
+              style={{
+                background:
+                  activeFilter === "All"
+                    ? "linear-gradient(135deg,#F47B1F,#E8620A)"
+                    : "white",
+                color: activeFilter === "All" ? "white" : "#917850",
+                borderColor:
+                  activeFilter === "All" ? "#F47B1F" : "rgba(0,0,0,0.1)",
+                boxShadow:
+                  activeFilter === "All"
+                    ? "0 4px 16px rgba(244,123,31,0.35)"
+                    : "none",
+              }}
+            >
               🍽️ All
             </button>
-            {categories.map(c => (
-              <button key={c.category} className="ud-filter" onClick={() => handleFilter(c.category)}
-                style={{ background: activeFilter === c.category ? 'linear-gradient(135deg,#F47B1F,#E8620A)' : 'white', color: activeFilter === c.category ? 'white' : '#917850', borderColor: activeFilter === c.category ? '#F47B1F' : 'rgba(0,0,0,0.1)', boxShadow: activeFilter === c.category ? '0 4px 16px rgba(244,123,31,0.35)' : 'none' }}>
+            {categories.map((c) => (
+              <button
+                key={c.category}
+                className="ud-filter"
+                onClick={() => handleFilter(c.category)}
+                style={{
+                  background:
+                    activeFilter === c.category
+                      ? "linear-gradient(135deg,#F47B1F,#E8620A)"
+                      : "white",
+                  color: activeFilter === c.category ? "white" : "#917850",
+                  borderColor:
+                    activeFilter === c.category ? "#F47B1F" : "rgba(0,0,0,0.1)",
+                  boxShadow:
+                    activeFilter === c.category
+                      ? "0 4px 16px rgba(244,123,31,0.35)"
+                      : "none",
+                }}
+              >
                 {c.category}
               </button>
             ))}
           </div>
           <div className="ud-scroll-wrap">
-            {catLeft && <button className="ud-scroll-btn" style={{ left: -16 }} onClick={() => scrl(cateRef, 'left')}><FaCircleChevronLeft size={17} /></button>}
+            {catLeft && (
+              <button
+                className="ud-scroll-btn"
+                style={{ left: -16 }}
+                onClick={() => scrl(cateRef, "left")}
+              >
+                <FaCircleChevronLeft size={17} />
+              </button>
+            )}
             <div className="ud-hscroll" ref={cateRef}>
               {categories.map((c, i) => (
-                <div key={i} className={`ud-cat${activeFilter === c.category ? ' active' : ''}`} onClick={() => handleFilter(c.category)}>
+                <div
+                  key={i}
+                  className={`ud-cat${activeFilter === c.category ? " active" : ""}`}
+                  onClick={() => handleFilter(c.category)}
+                >
                   <img src={c.image} alt={c.category} />
                   <div className="ud-cat-overlay" />
                   <div className="ud-cat-label">{c.category}</div>
-                  {activeFilter === c.category && <div className="ud-cat-check">✓</div>}
+                  {activeFilter === c.category && (
+                    <div className="ud-cat-check">✓</div>
+                  )}
                 </div>
               ))}
             </div>
-            {catRight && <button className="ud-scroll-btn" style={{ right: -16 }} onClick={() => scrl(cateRef, 'right')}><FaCircleChevronRight size={17} /></button>}
+            {catRight && (
+              <button
+                className="ud-scroll-btn"
+                style={{ right: -16 }}
+                onClick={() => scrl(cateRef, "right")}
+              >
+                <FaCircleChevronRight size={17} />
+              </button>
+            )}
           </div>
         </div>
 
@@ -268,26 +477,60 @@ function UserDashboard() {
         <div className="ud-section">
           <div className="ud-sec-hd">
             <div>
-              <div className="ud-sec-title">Top Restaurants in <span>{currentCity}</span></div>
+              <div className="ud-sec-title">
+                Top Restaurants in <span>{currentCity}</span>
+              </div>
               <div className="ud-sec-sub">Tap to explore their menu</div>
             </div>
-            <span className="ud-see-all">{shopInMyCity?.length || 0} restaurants →</span>
+            <span className="ud-see-all">
+              {shopInMyCity?.length || 0} restaurants →
+            </span>
           </div>
           <div className="ud-scroll-wrap">
-            {shopLeft && <button className="ud-scroll-btn" style={{ left: -16 }} onClick={() => scrl(shopRef, 'left')}><FaCircleChevronLeft size={17} /></button>}
+            {shopLeft && (
+              <button
+                className="ud-scroll-btn"
+                style={{ left: -16 }}
+                onClick={() => scrl(shopRef, "left")}
+              >
+                <FaCircleChevronLeft size={17} />
+              </button>
+            )}
             <div className="ud-hscroll" ref={shopRef}>
               {shopInMyCity?.map((shop, i) => (
-                <div key={i} className="ud-shop" onClick={() => navigate(`/shop/${shop._id}`)}>
-                  <img className="ud-shop-img" src={shop.image} alt={shop.name} />
+                <div
+                  key={i}
+                  className="ud-shop"
+                  onClick={() => navigate(`/shop/${shop._id}`)}
+                >
+                  <img
+                    className="ud-shop-img"
+                    src={shop.image}
+                    alt={shop.name}
+                  />
                   <div className="ud-shop-body">
                     <div className="ud-shop-name">{shop.name}</div>
-                    <div className="ud-shop-tag"><FaMapPin size={9} color="#F47B1F" />{shop.city}</div>
-                    <div className="ud-shop-rating"><FaStar size={10} />4.5</div>
+                    <div className="ud-shop-tag">
+                      <FaMapPin size={9} color="#F47B1F" />
+                      {shop.city}
+                    </div>
+                    <div className="ud-shop-rating">
+                      <FaStar size={10} />
+                      4.5
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
-            {shopRight && <button className="ud-scroll-btn" style={{ right: -16 }} onClick={() => scrl(shopRef, 'right')}><FaCircleChevronRight size={17} /></button>}
+            {shopRight && (
+              <button
+                className="ud-scroll-btn"
+                style={{ right: -16 }}
+                onClick={() => scrl(shopRef, "right")}
+              >
+                <FaCircleChevronRight size={17} />
+              </button>
+            )}
           </div>
         </div>
 
@@ -296,24 +539,53 @@ function UserDashboard() {
           <div className="ud-sec-hd">
             <div>
               <div className="ud-sec-title">
-                {activeFilter === 'All' || activeFilter === 'Search' ? <><FaFire size={22} color="#F47B1F" style={{ marginRight: 10, verticalAlign: 'middle' }} />Trending <span>Near You</span></> : <>✨ <span>{activeFilter}</span> Dishes</>}
+                {activeFilter === "All" || activeFilter === "Search" ? (
+                  <>
+                    <FaFire
+                      size={22}
+                      color="#F47B1F"
+                      style={{ marginRight: 10, verticalAlign: "middle" }}
+                    />
+                    Trending <span>Near You</span>
+                  </>
+                ) : (
+                  <>
+                    ✨ <span>{activeFilter}</span> Dishes
+                  </>
+                )}
               </div>
-              <div className="ud-sec-sub">{items?.length || 0} dishes available</div>
+              <div className="ud-sec-sub">
+                {items?.length || 0} dishes available
+              </div>
             </div>
           </div>
           <div className="ud-food-grid">
-            {items?.map((item, i) => <FoodCard key={i} data={item} />)}
+            {items?.map((item, i) => (
+              <FoodCard key={i} data={item} />
+            ))}
             {(!items || items.length === 0) && (
               <div className="ud-empty">
                 <div style={{ fontSize: 56, marginBottom: 14 }}>🍽️</div>
-                <div style={{ fontFamily: "'Fraunces',serif", fontSize: 22, fontWeight: 700, color: '#1C1507', marginBottom: 8 }}>No dishes found</div>
-                <div style={{ fontSize: 14, color: '#917850' }}>Try another category or broaden your search!</div>
+                <div
+                  style={{
+                    fontFamily: "'Fraunces',serif",
+                    fontSize: 22,
+                    fontWeight: 700,
+                    color: "#1C1507",
+                    marginBottom: 8,
+                  }}
+                >
+                  No dishes found
+                </div>
+                <div style={{ fontSize: 14, color: "#917850" }}>
+                  Try another category or broaden your search!
+                </div>
               </div>
             )}
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
-export default UserDashboard
+export default UserDashboard;

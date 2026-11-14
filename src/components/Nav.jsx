@@ -1,17 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { FaLocationDot } from "react-icons/fa6"
-import { IoIosSearch } from "react-icons/io"
-import { FiShoppingCart, FiMenu, FiX } from "react-icons/fi"
-import { useDispatch, useSelector } from 'react-redux'
-import axios from 'axios'
-import { serverUrl } from '../App'
-import { setSearchItems, setUserData } from '../redux/userSlice'
-import { FaPlus } from "react-icons/fa6"
-import { FaUtensils } from "react-icons/fa"
-import { TbReceipt2, TbLayoutDashboard } from "react-icons/tb"
-import { MdOutlineLocalShipping } from "react-icons/md"
-import { useNavigate, useLocation } from 'react-router-dom'
-import BrandLogo from './BrandLogo'
+import React, { useEffect, useRef, useState } from "react";
+import { FaLocationDot } from "react-icons/fa6";
+import { IoIosSearch } from "react-icons/io";
+import { FiShoppingCart, FiMenu, FiX } from "react-icons/fi";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { serverUrl } from "../App";
+import { setSearchItems, setUserData } from "../redux/userSlice";
+import { FaPlus } from "react-icons/fa6";
+import { FaUtensils } from "react-icons/fa";
+import { TbReceipt2, TbLayoutDashboard } from "react-icons/tb";
+import { MdOutlineLocalShipping } from "react-icons/md";
+import { useNavigate, useLocation } from "react-router-dom";
+import BrandLogo from "./BrandLogo";
 
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Outfit:wght@400;500;600;700;800&display=swap');
@@ -129,112 +129,228 @@ const CSS = `
   .nav-actions .nav-btn:not(.cart-btn){display:none;}
 }
 @media(max-width:640px){.nav-mobile-toggle{display:flex;}}
-`
+`;
 
 function Nav() {
-  const { userData, cartItems, currentCity } = useSelector(s => s.user)
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const [scrolled, setScrolled] = useState(false)
-  const [query, setQuery] = useState('')
-  const [showDrop, setShowDrop] = useState(false)
-  const [showMobile, setShowMobile] = useState(false)
-  const dropRef = useRef()
+  const { userData, cartItems, currentCity } = useSelector((s) => s.user);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [scrolled, setScrolled] = useState(false);
+  const [query, setQuery] = useState("");
+  const [showDrop, setShowDrop] = useState(false);
+  const [showMobile, setShowMobile] = useState(false);
+  const dropRef = useRef();
 
-  const isOnHeroPage = ['/', '/home'].includes(location.pathname) || location.pathname === '/'
-  const isSolidPage = !['/'].includes(location.pathname)
-
-  useEffect(() => {
-    const h = () => setScrolled(window.scrollY > 60)
-    window.addEventListener('scroll', h, { passive: true })
-    return () => window.removeEventListener('scroll', h)
-  }, [])
+  const isOnHeroPage =
+    ["/", "/home"].includes(location.pathname) || location.pathname === "/";
+  const isSolidPage = !["/"].includes(location.pathname);
 
   useEffect(() => {
-    const h = (e) => { if (dropRef.current && !dropRef.current.contains(e.target)) setShowDrop(false) }
-    document.addEventListener('mousedown', h)
-    return () => document.removeEventListener('mousedown', h)
-  }, [])
+    const h = () => setScrolled(window.scrollY > 60);
+    window.addEventListener("scroll", h, { passive: true });
+    return () => window.removeEventListener("scroll", h);
+  }, []);
+
+  useEffect(() => {
+    const h = (e) => {
+      if (dropRef.current && !dropRef.current.contains(e.target))
+        setShowDrop(false);
+    };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
 
   const handleSearch = async () => {
-    if (!query.trim()) return dispatch(setSearchItems([]))
+    if (!query.trim()) return dispatch(setSearchItems([]));
     try {
-      const { data } = await axios.get(`${serverUrl}/api/item/search?q=${query}&city=${currentCity}`, { withCredentials: true })
-      dispatch(setSearchItems(data))
-    } catch (e) { console.log(e) }
-  }
+      const { data } = await axios.get(
+        `${serverUrl}/api/item/search?q=${query}&city=${currentCity}`,
+        { withCredentials: true },
+      );
+      dispatch(setSearchItems(data));
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const handleLogout = async () => {
     try {
-      await axios.get(`${serverUrl}/api/auth/signout`, { withCredentials: true })
-      dispatch(setUserData(null))
-      navigate('/landing')
-    } catch (e) { console.log(e) }
-  }
+      await axios.get(`${serverUrl}/api/auth/signout`, {
+        withCredentials: true,
+      });
+      dispatch(setUserData(null));
+      navigate("/landing");
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
-  const cartCount = cartItems?.reduce((a, b) => a + b.quantity, 0) || 0
-  const initial = userData?.fullName?.[0]?.toUpperCase() || '?'
+  const cartCount = cartItems?.reduce((a, b) => a + b.quantity, 0) || 0;
+  const initial = userData?.fullName?.[0]?.toUpperCase() || "?";
 
-  const navLinks = userData?.role === 'owner'
-    ? [{ icon: <TbLayoutDashboard size={16} />, label: 'Dashboard', path: '/' }, { icon: <FaPlus size={14} />, label: 'Add Item', path: '/add-item' }, { icon: <TbReceipt2 size={16} />, label: 'Orders', path: '/my-orders' }]
-    : userData?.role === 'deliveryBoy'
-    ? [{ icon: <MdOutlineLocalShipping size={16} />, label: 'Deliveries', path: '/' }]
-    : [{ icon: <FaUtensils size={14} />, label: 'Explore', path: '/' }, { icon: <TbReceipt2 size={16} />, label: 'Orders', path: '/my-orders' }]
+  const navLinks =
+    userData?.role === "owner"
+      ? [
+          {
+            icon: <TbLayoutDashboard size={16} />,
+            label: "Dashboard",
+            path: "/",
+          },
+          { icon: <FaPlus size={14} />, label: "Add Item", path: "/add-item" },
+          {
+            icon: <TbReceipt2 size={16} />,
+            label: "Orders",
+            path: "/my-orders",
+          },
+        ]
+      : userData?.role === "deliveryBoy"
+        ? [
+            {
+              icon: <MdOutlineLocalShipping size={16} />,
+              label: "Deliveries",
+              path: "/",
+            },
+          ]
+        : [
+            { icon: <FaUtensils size={14} />, label: "Explore", path: "/" },
+            {
+              icon: <TbReceipt2 size={16} />,
+              label: "Orders",
+              path: "/my-orders",
+            },
+          ];
 
   return (
     <>
       <style>{CSS}</style>
-      <nav className={`nav-root ${scrolled ? 'scrolled' : isSolidPage ? 'solid' : 'at-top'}`}>
+      <nav
+        className={`nav-root ${scrolled ? "scrolled" : isSolidPage ? "solid" : "at-top"}`}
+      >
         <div className="nav-inner">
-          <BrandLogo size="md" theme="light" tagline="Network" onClick={() => navigate('/')} style={{ flexShrink: 0 }} />
+          <BrandLogo
+            size="md"
+            theme="light"
+            tagline="Network"
+            onClick={() => navigate("/")}
+            style={{ flexShrink: 0 }}
+          />
 
           {/* Search */}
           <div className="nav-search">
             <div className="nav-city">
               <FaLocationDot size={12} color="#F47B1F" />
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{currentCity || 'Locating...'}</span>
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+                {currentCity || "Locating..."}
+              </span>
             </div>
-            <input className="nav-input" placeholder="Search dishes, restaurants..." value={query}
-              onChange={e => { setQuery(e.target.value); if (!e.target.value.trim()) dispatch(setSearchItems([])) }}
-              onKeyDown={e => e.key === 'Enter' && handleSearch()} />
-            <button className="nav-search-btn" onClick={handleSearch}><IoIosSearch size={18} /></button>
+            <input
+              className="nav-input"
+              placeholder="Search dishes, restaurants..."
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                if (!e.target.value.trim()) dispatch(setSearchItems([]));
+              }}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
+            <button className="nav-search-btn" onClick={handleSearch}>
+              <IoIosSearch size={18} />
+            </button>
           </div>
 
           <div className="nav-actions">
-            {navLinks.map(l => (
-              <button key={l.path} className="nav-btn" style={{ background: location.pathname === l.path ? 'rgba(244,123,31,0.14)' : undefined, borderColor: location.pathname === l.path ? 'rgba(244,123,31,0.3)' : undefined }} onClick={() => navigate(l.path)}>
-                {l.icon}{l.label}
+            {navLinks.map((l) => (
+              <button
+                key={l.path}
+                className="nav-btn"
+                style={{
+                  background:
+                    location.pathname === l.path
+                      ? "rgba(244,123,31,0.14)"
+                      : undefined,
+                  borderColor:
+                    location.pathname === l.path
+                      ? "rgba(244,123,31,0.3)"
+                      : undefined,
+                }}
+                onClick={() => navigate(l.path)}
+              >
+                {l.icon}
+                {l.label}
               </button>
             ))}
 
-            {userData?.role === 'user' && (
-              <button className="nav-btn cart-btn" onClick={() => navigate('/cart')} style={{ padding: '9px 16px' }}>
+            {userData?.role === "user" && (
+              <button
+                className="nav-btn cart-btn"
+                onClick={() => navigate("/cart")}
+                style={{ padding: "9px 16px" }}
+              >
                 <FiShoppingCart size={17} />
                 Cart
-                {cartCount > 0 && <span className="nav-cart-badge">{cartCount}</span>}
+                {cartCount > 0 && (
+                  <span className="nav-cart-badge">{cartCount}</span>
+                )}
               </button>
             )}
 
-            <div style={{ position: 'relative' }} ref={dropRef}>
-              <div className="nav-avatar" onClick={() => setShowDrop(!showDrop)}>{initial}</div>
+            <div style={{ position: "relative" }} ref={dropRef}>
+              <div
+                className="nav-avatar"
+                onClick={() => setShowDrop(!showDrop)}
+              >
+                {initial}
+              </div>
               {showDrop && (
                 <div className="nav-dropdown">
                   <div className="nav-dd-user">
                     <div className="nav-dd-user-name">{userData?.fullName}</div>
                     <div className="nav-dd-user-email">{userData?.email}</div>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'rgba(244,123,31,0.1)', borderRadius: 8, padding: '3px 10px', fontSize: 11, color: '#F47B1F', fontWeight: 700, marginTop: 6 }}>
-                      {userData?.role === 'owner' ? '🍳 Restaurant Owner' : userData?.role === 'deliveryBoy' ? '🛵 Delivery Partner' : '🛒 Customer'}
+                    <div
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 5,
+                        background: "rgba(244,123,31,0.1)",
+                        borderRadius: 8,
+                        padding: "3px 10px",
+                        fontSize: 11,
+                        color: "#F47B1F",
+                        fontWeight: 700,
+                        marginTop: 6,
+                      }}
+                    >
+                      {userData?.role === "owner"
+                        ? "🍳 Restaurant Owner"
+                        : userData?.role === "deliveryBoy"
+                          ? "🛵 Delivery Partner"
+                          : "🛒 Customer"}
                     </div>
                   </div>
-                  {navLinks.map(l => (
-                    <div key={l.path} className="nav-dd-item" onClick={() => { navigate(l.path); setShowDrop(false) }}>
-                      {l.icon}{l.label}
+                  {navLinks.map((l) => (
+                    <div
+                      key={l.path}
+                      className="nav-dd-item"
+                      onClick={() => {
+                        navigate(l.path);
+                        setShowDrop(false);
+                      }}
+                    >
+                      {l.icon}
+                      {l.label}
                     </div>
                   ))}
-                  {userData?.role === 'user' && (
-                    <div className="nav-dd-item" onClick={() => { navigate('/cart'); setShowDrop(false) }}>
-                      <FiShoppingCart size={16} />Cart {cartCount > 0 && `(${cartCount})`}
+                  {userData?.role === "user" && (
+                    <div
+                      className="nav-dd-item"
+                      onClick={() => {
+                        navigate("/cart");
+                        setShowDrop(false);
+                      }}
+                    >
+                      <FiShoppingCart size={16} />
+                      Cart {cartCount > 0 && `(${cartCount})`}
                     </div>
                   )}
                   <div className="nav-dd-divider" />
@@ -245,41 +361,122 @@ function Nav() {
               )}
             </div>
 
-            <button className="nav-mobile-toggle" onClick={() => setShowMobile(true)}><FiMenu size={20} /></button>
+            <button
+              className="nav-mobile-toggle"
+              onClick={() => setShowMobile(true)}
+            >
+              <FiMenu size={20} />
+            </button>
           </div>
         </div>
       </nav>
 
       {/* Mobile Menu */}
-      <div className={`nav-mobile-menu ${showMobile ? 'open' : ''}`} onClick={() => setShowMobile(false)}>
-        <div className="nav-mobile-panel" onClick={e => e.stopPropagation()}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-            <div style={{ fontFamily: "'Fraunces',serif", fontSize: 20, fontWeight: 700, color: '#1C1507' }}>Menu</div>
-            <button onClick={() => setShowMobile(false)} style={{ background: 'rgba(244,123,31,0.08)', border: '1.5px solid rgba(244,123,31,0.15)', borderRadius: 12, padding: 9, cursor: 'pointer', color: '#F47B1F' }}><FiX size={18} /></button>
+      <div
+        className={`nav-mobile-menu ${showMobile ? "open" : ""}`}
+        onClick={() => setShowMobile(false)}
+      >
+        <div className="nav-mobile-panel" onClick={(e) => e.stopPropagation()}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 24,
+            }}
+          >
+            <div
+              style={{
+                fontFamily: "'Fraunces',serif",
+                fontSize: 20,
+                fontWeight: 700,
+                color: "#1C1507",
+              }}
+            >
+              Menu
+            </div>
+            <button
+              onClick={() => setShowMobile(false)}
+              style={{
+                background: "rgba(244,123,31,0.08)",
+                border: "1.5px solid rgba(244,123,31,0.15)",
+                borderRadius: 12,
+                padding: 9,
+                cursor: "pointer",
+                color: "#F47B1F",
+              }}
+            >
+              <FiX size={18} />
+            </button>
           </div>
           {/* Search in mobile */}
-          <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-            <input style={{ flex: 1, border: '2px solid rgba(244,123,31,0.2)', borderRadius: 14, padding: '11px 14px', fontFamily: "'Outfit',sans-serif", fontSize: 14, color: '#1C1507', outline: 'none', background: '#FAFAF8' }}
-              placeholder="Search food..." value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()} />
-            <button onClick={handleSearch} style={{ background: 'linear-gradient(135deg,#F47B1F,#E8620A)', color: 'white', border: 'none', borderRadius: 14, padding: '0 16px', cursor: 'pointer', fontSize: 18 }}><IoIosSearch /></button>
+          <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+            <input
+              style={{
+                flex: 1,
+                border: "2px solid rgba(244,123,31,0.2)",
+                borderRadius: 14,
+                padding: "11px 14px",
+                fontFamily: "'Outfit',sans-serif",
+                fontSize: 14,
+                color: "#1C1507",
+                outline: "none",
+                background: "#FAFAF8",
+              }}
+              placeholder="Search food..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
+            <button
+              onClick={handleSearch}
+              style={{
+                background: "linear-gradient(135deg,#F47B1F,#E8620A)",
+                color: "white",
+                border: "none",
+                borderRadius: 14,
+                padding: "0 16px",
+                cursor: "pointer",
+                fontSize: 18,
+              }}
+            >
+              <IoIosSearch />
+            </button>
           </div>
-          {navLinks.map(l => (
-            <div key={l.path} className="nav-dd-item" style={{ marginBottom: 4 }} onClick={() => { navigate(l.path); setShowMobile(false) }}>
-              {l.icon}{l.label}
+          {navLinks.map((l) => (
+            <div
+              key={l.path}
+              className="nav-dd-item"
+              style={{ marginBottom: 4 }}
+              onClick={() => {
+                navigate(l.path);
+                setShowMobile(false);
+              }}
+            >
+              {l.icon}
+              {l.label}
             </div>
           ))}
-          {userData?.role === 'user' && (
-            <div className="nav-dd-item" style={{ marginBottom: 4 }} onClick={() => { navigate('/cart'); setShowMobile(false) }}>
-              <FiShoppingCart size={16} />Cart {cartCount > 0 && `(${cartCount})`}
+          {userData?.role === "user" && (
+            <div
+              className="nav-dd-item"
+              style={{ marginBottom: 4 }}
+              onClick={() => {
+                navigate("/cart");
+                setShowMobile(false);
+              }}
+            >
+              <FiShoppingCart size={16} />
+              Cart {cartCount > 0 && `(${cartCount})`}
             </div>
           )}
-          <div className="nav-dd-divider" style={{ margin: '12px 0' }} />
+          <div className="nav-dd-divider" style={{ margin: "12px 0" }} />
           <div className="nav-dd-item danger" onClick={handleLogout}>
             <span>👋</span>Sign Out
           </div>
         </div>
       </div>
     </>
-  )
+  );
 }
-export default Nav
+export default Nav;
