@@ -1,15 +1,15 @@
-import React, { useState } from 'react'
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa"
-import { FcGoogle } from "react-icons/fc"
-import { useNavigate } from 'react-router-dom'
-import axios from "axios"
-import { serverUrl } from '../App'
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
-import { auth } from '../../firebase'
-import { ClipLoader } from "react-spinners"
-import { useDispatch } from 'react-redux'
-import { setUserData } from '../redux/userSlice'
-import BrandLogo from '../components/BrandLogo'
+import React, { useState } from "react";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { serverUrl } from "../App";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../../firebase";
+import { ClipLoader } from "react-spinners";
+import { useDispatch } from "react-redux";
+import { setUserData } from "../redux/userSlice";
+import BrandLogo from "../components/BrandLogo";
 
 const S = `
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
@@ -60,82 +60,177 @@ const S = `
 .su-eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#917850;}
 @media(min-width:960px){.su-left{display:flex;}}
 @media(max-width:480px){.su-grid{grid-template-columns:1fr;}.su-role-row{grid-template-columns:1fr 1fr;}}
-`
+`;
 
 const roles = [
-  { id: 'user', icon: '🛒', name: 'Customer', desc: 'Order food' },
-  { id: 'owner', icon: '🍳', name: 'Restaurant', desc: 'Sell food' },
-  { id: 'deliveryBoy', icon: '🛵', name: 'Delivery', desc: 'Deliver food' },
-]
+  { id: "user", icon: "🛒", name: "Customer", desc: "Order food" },
+  { id: "owner", icon: "🍳", name: "Restaurant", desc: "Sell food" },
+  { id: "deliveryBoy", icon: "🛵", name: "Delivery", desc: "Deliver food" },
+];
 
 function SignUp() {
-  const [showPwd, setShowPwd] = useState(false)
-  const [role, setRole] = useState('user')
-  const navigate = useNavigate()
-  const [fullName, setFullName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [mobile, setMobile] = useState('')
-  const [err, setErr] = useState('')
-  const [loading, setLoading] = useState(false)
-  const dispatch = useDispatch()
+  const [showPwd, setShowPwd] = useState(false);
+  const [role, setRole] = useState("user");
+  const navigate = useNavigate();
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const handleSignUp = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const result = await axios.post(`${serverUrl}/api/auth/signup`, { fullName, email, password, mobile, role }, { withCredentials: true })
-      dispatch(setUserData(result.data)); setErr('')
+      const result = await axios.post(
+        `${serverUrl}/api/auth/signup`,
+        { fullName, email, password, mobile, role },
+        { withCredentials: true },
+      );
+      dispatch(setUserData(result.data));
+      setErr("");
     } catch (error) {
-      setErr(error?.response?.data?.message || 'Sign up failed. Please try again.')
+      setErr(
+        error?.response?.data?.message || "Sign up failed. Please try again.",
+      );
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   const handleGoogleAuth = async () => {
-    if (!mobile) return setErr('Mobile number is required for Google sign up')
-    const provider = new GoogleAuthProvider()
-    const result = await signInWithPopup(auth, provider)
+    if (!mobile) return setErr("Mobile number is required for Google sign up");
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
     try {
-      const { data } = await axios.post(`${serverUrl}/api/auth/google-auth`, { email: result.user.email, mobile, role }, { withCredentials: true })
-      dispatch(setUserData(data))
-    } catch (e) { console.log(e) }
-  }
+      const { data } = await axios.post(
+        `${serverUrl}/api/auth/google-auth`,
+        { email: result.user.email, mobile, role },
+        { withCredentials: true },
+      );
+      dispatch(setUserData(data));
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   return (
     <div className="su">
       <style>{S}</style>
       <div className="su-left">
         <div className="su-left-grid" />
-        <div className="su-orb" style={{ top: '-10%', right: '-10%', width: 380, height: 380, background: 'radial-gradient(circle,rgba(244,123,31,0.2),transparent 65%)' }} />
-        <div className="su-orb" style={{ bottom: '-10%', left: '-5%', width: 260, height: 260, background: 'radial-gradient(circle,rgba(250,160,64,0.12),transparent 65%)' }} />
+        <div
+          className="su-orb"
+          style={{
+            top: "-10%",
+            right: "-10%",
+            width: 380,
+            height: 380,
+            background:
+              "radial-gradient(circle,rgba(244,123,31,0.2),transparent 65%)",
+          }}
+        />
+        <div
+          className="su-orb"
+          style={{
+            bottom: "-10%",
+            left: "-5%",
+            width: 260,
+            height: 260,
+            background:
+              "radial-gradient(circle,rgba(250,160,64,0.12),transparent 65%)",
+          }}
+        />
         <div className="su-left-content">
-          <BrandLogo size="lg" theme="dark" tagline="Network" style={{ marginBottom: 64 }} />
-          <div className="su-left-h">Join India's<br /><span>premier food</span><br />platform</div>
-          <p className="su-left-desc">Whether you're hungry, cooking, or delivering — Pakwan Network has a place for you.</p>
+          <BrandLogo
+            size="lg"
+            theme="dark"
+            tagline="Network"
+            style={{ marginBottom: 64 }}
+          />
+          <div className="su-left-h">
+            Join India's
+            <br />
+            <span>premier food</span>
+            <br />
+            platform
+          </div>
+          <p className="su-left-desc">
+            Whether you're hungry, cooking, or delivering — Pakwan Network has a
+            place for you.
+          </p>
           <div className="su-roles">
-            {[{ icon: '🛒', name: 'Customers', desc: 'Order from 1200+ restaurants' }, { icon: '🍳', name: 'Restaurant Owners', desc: 'Reach thousands of customers' }, { icon: '🛵', name: 'Delivery Partners', desc: 'Earn on your schedule' }].map(r => (
+            {[
+              {
+                icon: "🛒",
+                name: "Customers",
+                desc: "Order from 1200+ restaurants",
+              },
+              {
+                icon: "🍳",
+                name: "Restaurant Owners",
+                desc: "Reach thousands of customers",
+              },
+              {
+                icon: "🛵",
+                name: "Delivery Partners",
+                desc: "Earn on your schedule",
+              },
+            ].map((r) => (
               <div key={r.name} className="su-role-item">
                 <div className="su-role-icon">{r.icon}</div>
-                <div><div className="su-role-name">{r.name}</div><div className="su-role-desc">{r.desc}</div></div>
+                <div>
+                  <div className="su-role-name">{r.name}</div>
+                  <div className="su-role-desc">{r.desc}</div>
+                </div>
               </div>
             ))}
           </div>
         </div>
-        <div style={{ position: 'relative', zIndex: 1, fontSize: 13, color: 'rgba(250,250,248,0.3)', fontWeight: 600 }}>© 2025 Pakwan Network. All rights reserved.</div>
+        <div
+          style={{
+            position: "relative",
+            zIndex: 1,
+            fontSize: 13,
+            color: "rgba(250,250,248,0.3)",
+            fontWeight: 600,
+          }}
+        >
+          © 2025 Pakwan Network. All rights reserved.
+        </div>
       </div>
 
       <div className="su-right">
         <div className="su-card">
-          <h1 className="su-heading">Create <span>Account</span></h1>
-          <p className="su-tagline">Already have an account? <span style={{ color: '#F47B1F', fontWeight: 700, cursor: 'pointer' }} onClick={() => navigate('/signin')}>Sign in →</span></p>
+          <h1 className="su-heading">
+            Create <span>Account</span>
+          </h1>
+          <p className="su-tagline">
+            Already have an account?{" "}
+            <span
+              style={{ color: "#F47B1F", fontWeight: 700, cursor: "pointer" }}
+              onClick={() => navigate("/signin")}
+            >
+              Sign in →
+            </span>
+          </p>
 
           {err && <div className="su-err">⚠️ {err}</div>}
 
           <label className="su-label">I want to join as...</label>
           <div className="su-role-row" style={{ marginBottom: 20 }}>
-            {roles.map(r => (
-              <div key={r.id} className="su-role-card" onClick={() => setRole(r.id)}
-                style={{ borderColor: role === r.id ? '#F47B1F' : 'rgba(0,0,0,0.09)', background: role === r.id ? 'rgba(244,123,31,0.06)' : 'white', boxShadow: role === r.id ? '0 4px 16px rgba(244,123,31,0.2)' : 'none' }}>
+            {roles.map((r) => (
+              <div
+                key={r.id}
+                className="su-role-card"
+                onClick={() => setRole(r.id)}
+                style={{
+                  borderColor: role === r.id ? "#F47B1F" : "rgba(0,0,0,0.09)",
+                  background: role === r.id ? "rgba(244,123,31,0.06)" : "white",
+                  boxShadow:
+                    role === r.id ? "0 4px 16px rgba(244,123,31,0.2)" : "none",
+                }}
+              >
                 <div className="rci">{r.icon}</div>
                 <div className="rcn">{r.name}</div>
                 <div className="rcd">{r.desc}</div>
@@ -146,34 +241,88 @@ function SignUp() {
           <div className="su-grid">
             <div>
               <label className="su-label">Full Name</label>
-              <input className="su-input" placeholder="Your name" value={fullName} onChange={e => setFullName(e.target.value)} />
+              <input
+                className="su-input"
+                placeholder="Your name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+              />
             </div>
             <div>
               <label className="su-label">Mobile Number</label>
-              <input className="su-input" placeholder="+91 XXXXX XXXXX" value={mobile} onChange={e => setMobile(e.target.value)} />
+              <input
+                className="su-input"
+                placeholder="+91 XXXXX XXXXX"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value)}
+              />
             </div>
           </div>
 
           <label className="su-label">Email Address</label>
-          <input className="su-input" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} />
+          <input
+            className="su-input"
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
           <label className="su-label">Password</label>
           <div className="su-pass-wrap">
-            <input className="su-input" type={showPwd ? 'text' : 'password'} placeholder="Create a strong password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSignUp()} />
-            <button className="su-eye" onClick={() => setShowPwd(!showPwd)}>{showPwd ? <FaRegEyeSlash size={17} color="#917850" /> : <FaRegEye size={17} color="#917850" />}</button>
+            <input
+              className="su-input"
+              type={showPwd ? "text" : "password"}
+              placeholder="Create a strong password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSignUp()}
+            />
+            <button className="su-eye" onClick={() => setShowPwd(!showPwd)}>
+              {showPwd ? (
+                <FaRegEyeSlash size={17} color="#917850" />
+              ) : (
+                <FaRegEye size={17} color="#917850" />
+              )}
+            </button>
           </div>
 
-          <button className="su-btn" onClick={handleSignUp} disabled={loading} style={{ marginTop: 8 }}>
-            {loading ? <ClipLoader size={18} color="white" /> : 'Create Account →'}
+          <button
+            className="su-btn"
+            onClick={handleSignUp}
+            disabled={loading}
+            style={{ marginTop: 8 }}
+          >
+            {loading ? (
+              <ClipLoader size={18} color="white" />
+            ) : (
+              "Create Account →"
+            )}
           </button>
           <div className="su-divider">or</div>
-          <button className="su-google" onClick={handleGoogleAuth}><FcGoogle size={22} />Continue with Google</button>
-          <div style={{ fontSize: 13, color: '#917850', textAlign: 'center', marginTop: 16 }}>
-            Already have an account? <span style={{ color: '#F47B1F', fontWeight: 700, cursor: 'pointer' }} onClick={() => navigate('/signin')}>Sign in</span>
+          <button className="su-google" onClick={handleGoogleAuth}>
+            <FcGoogle size={22} />
+            Continue with Google
+          </button>
+          <div
+            style={{
+              fontSize: 13,
+              color: "#917850",
+              textAlign: "center",
+              marginTop: 16,
+            }}
+          >
+            Already have an account?{" "}
+            <span
+              style={{ color: "#F47B1F", fontWeight: 700, cursor: "pointer" }}
+              onClick={() => navigate("/signin")}
+            >
+              Sign in
+            </span>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
-export default SignUp
+export default SignUp;
