@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { IoIosArrowRoundBack } from "react-icons/io"
-import { useNavigate } from 'react-router-dom'
-import UserOrderCard from '../components/UserOrderCard'
-import OwnerOrderCard from '../components/OwnerOrderCard'
-import { setMyOrders, updateRealtimeOrderStatus } from '../redux/userSlice'
-import Nav from '../components/Nav'
-import { FaClipboardList, FaFilter } from 'react-icons/fa'
-import { TbChefHat } from 'react-icons/tb'
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { IoIosArrowRoundBack } from "react-icons/io";
+import { useNavigate } from "react-router-dom";
+import UserOrderCard from "../components/UserOrderCard";
+import OwnerOrderCard from "../components/OwnerOrderCard";
+import { setMyOrders, updateRealtimeOrderStatus } from "../redux/userSlice";
+import Nav from "../components/Nav";
+import { FaClipboardList, FaFilter } from "react-icons/fa";
+import { TbChefHat } from "react-icons/tb";
 
 const S = `
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Outfit:wght@400;500;600;700;800&display=swap');
@@ -36,62 +36,103 @@ const S = `
 .mo-empty{background:white;border-radius:28px;padding:72px 40px;text-align:center;box-shadow:0 4px 28px rgba(0,0,0,0.07);border:2px solid rgba(244,123,31,0.07);}
 .mo-back-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(244,123,31,0.08);border:1.5px solid rgba(244,123,31,0.2);border-radius:13px;padding:9px 18px;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;color:#F47B1F;transition:all 0.2s;}
 .mo-back-btn:hover{background:rgba(244,123,31,0.14);}
-`
+`;
 
-const STATUS_FILTERS_USER = ['All', 'Pending', 'Preparing', 'Out For Delivery', 'Delivered']
-const STATUS_FILTERS_OWNER = ['All', 'Pending', 'Preparing', 'Out For Delivery', 'Delivered']
+const STATUS_FILTERS_USER = [
+  "All",
+  "Pending",
+  "Preparing",
+  "Out For Delivery",
+  "Delivered",
+];
+const STATUS_FILTERS_OWNER = [
+  "All",
+  "Pending",
+  "Preparing",
+  "Out For Delivery",
+  "Delivered",
+];
 
 function MyOrders() {
-  const { userData, myOrders, socket } = useSelector(s => s.user)
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const [filter, setFilter] = useState('All')
+  const { userData, myOrders, socket } = useSelector((s) => s.user);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [filter, setFilter] = useState("All");
 
   useEffect(() => {
-    socket?.on('newOrder', (data) => {
-      if (data.shopOrders?.owner._id == userData._id) dispatch(setMyOrders([data, ...myOrders]))
-    })
-    socket?.on('update-status', ({ orderId, shopId, status, userId }) => {
-      if (userId == userData._id) dispatch(updateRealtimeOrderStatus({ orderId, shopId, status }))
-    })
-    return () => { socket?.off('newOrder'); socket?.off('update-status') }
-  }, [socket])
+    socket?.on("newOrder", (data) => {
+      if (data.shopOrders?.owner._id == userData._id)
+        dispatch(setMyOrders([data, ...myOrders]));
+    });
+    socket?.on("update-status", ({ orderId, shopId, status, userId }) => {
+      if (userId == userData._id)
+        dispatch(updateRealtimeOrderStatus({ orderId, shopId, status }));
+    });
+    return () => {
+      socket?.off("newOrder");
+      socket?.off("update-status");
+    };
+  }, [socket]);
 
-  const isOwner = userData?.role === 'owner'
+  const isOwner = userData?.role === "owner";
 
   const getStatus = (o) => {
-    if (Array.isArray(o.shopOrders)) return o.shopOrders?.[0]?.status
-    return o.shopOrders?.status
-  }
+    if (Array.isArray(o.shopOrders)) return o.shopOrders?.[0]?.status;
+    return o.shopOrders?.status;
+  };
 
-  const filteredOrders = filter === 'All' ? myOrders : myOrders?.filter(o => {
-    const st = getStatus(o)
-    return st?.toLowerCase().includes(filter.toLowerCase())
-  })
+  const filteredOrders =
+    filter === "All"
+      ? myOrders
+      : myOrders?.filter((o) => {
+          const st = getStatus(o);
+          return st?.toLowerCase().includes(filter.toLowerCase());
+        });
 
-  const pendingCount = myOrders?.filter(o => getStatus(o) === 'pending').length || 0
-  const deliveredCount = myOrders?.filter(o => getStatus(o) === 'delivered').length || 0
+  const pendingCount =
+    myOrders?.filter((o) => getStatus(o) === "pending").length || 0;
+  const deliveredCount =
+    myOrders?.filter((o) => getStatus(o) === "delivered").length || 0;
 
   return (
     <div className="mo">
       <style>{S}</style>
       <Nav />
       <section className="mo-hero">
-        <div className="mo-hero-grid" /><div className="mo-hero-orb" />
+        <div className="mo-hero-grid" />
+        <div className="mo-hero-orb" />
         <div className="mo-hero-inner">
-          <div className="mo-badge">{isOwner ? <TbChefHat size={13} /> : <FaClipboardList size={11} />}{isOwner ? 'Restaurant Dashboard' : 'My Orders'}</div>
+          <div className="mo-badge">
+            {isOwner ? <TbChefHat size={13} /> : <FaClipboardList size={11} />}
+            {isOwner ? "Restaurant Dashboard" : "My Orders"}
+          </div>
           <h1 className="mo-title">
-            {isOwner ? <>Incoming <span>Orders</span></> : <>My <span>Orders</span></>}
+            {isOwner ? (
+              <>
+                Incoming <span>Orders</span>
+              </>
+            ) : (
+              <>
+                My <span>Orders</span>
+              </>
+            )}
           </h1>
-          <p className="mo-sub">{isOwner ? 'Manage and track your restaurant orders in real-time.' : `${myOrders?.length || 0} total orders placed`}</p>
+          <p className="mo-sub">
+            {isOwner
+              ? "Manage and track your restaurant orders in real-time."
+              : `${myOrders?.length || 0} total orders placed`}
+          </p>
           <div className="mo-stats">
             {[
-              { v: myOrders?.length || 0, l: 'Total Orders' },
-              { v: pendingCount, l: 'Pending' },
-              { v: deliveredCount, l: 'Delivered' }
-            ].map(s => (
+              { v: myOrders?.length || 0, l: "Total Orders" },
+              { v: pendingCount, l: "Pending" },
+              { v: deliveredCount, l: "Delivered" },
+            ].map((s) => (
               <div key={s.l} className="mo-stat">
-                <div><div className="mo-stat-val">{s.v}</div><div className="mo-stat-label">{s.l}</div></div>
+                <div>
+                  <div className="mo-stat-val">{s.v}</div>
+                  <div className="mo-stat-label">{s.l}</div>
+                </div>
               </div>
             ))}
           </div>
@@ -100,13 +141,38 @@ function MyOrders() {
 
       <div className="mo-body">
         <div className="mo-toolbar">
-          <div className="mo-section-title">Order <span>History</span></div>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-            <button className="mo-back-btn" onClick={() => navigate('/')}><IoIosArrowRoundBack size={18} />Back</button>
+          <div className="mo-section-title">
+            Order <span>History</span>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              gap: 10,
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            <button className="mo-back-btn" onClick={() => navigate("/")}>
+              <IoIosArrowRoundBack size={18} />
+              Back
+            </button>
             <div className="mo-filter-tabs">
-              {STATUS_FILTERS_USER.map(f => (
-                <button key={f} className="mo-tab" onClick={() => setFilter(f)}
-                  style={{ background: filter === f ? 'linear-gradient(135deg,#F47B1F,#E8620A)' : 'white', color: filter === f ? 'white' : '#917850', borderColor: filter === f ? '#F47B1F' : 'rgba(0,0,0,0.1)', boxShadow: filter === f ? '0 4px 14px rgba(244,123,31,0.3)' : 'none' }}>
+              {STATUS_FILTERS_USER.map((f) => (
+                <button
+                  key={f}
+                  className="mo-tab"
+                  onClick={() => setFilter(f)}
+                  style={{
+                    background:
+                      filter === f
+                        ? "linear-gradient(135deg,#F47B1F,#E8620A)"
+                        : "white",
+                    color: filter === f ? "white" : "#917850",
+                    borderColor: filter === f ? "#F47B1F" : "rgba(0,0,0,0.1)",
+                    boxShadow:
+                      filter === f ? "0 4px 14px rgba(244,123,31,0.3)" : "none",
+                  }}
+                >
                   {f}
                 </button>
               ))}
@@ -116,19 +182,55 @@ function MyOrders() {
 
         {filteredOrders?.length > 0 ? (
           <div className="mo-orders-list">
-            {filteredOrders.map((o, i) => isOwner ? <OwnerOrderCard key={i} data={o} /> : <UserOrderCard key={i} data={o} />)}
+            {filteredOrders.map((o, i) =>
+              isOwner ? (
+                <OwnerOrderCard key={i} data={o} />
+              ) : (
+                <UserOrderCard key={i} data={o} />
+              ),
+            )}
           </div>
         ) : (
           <div className="mo-empty">
-            <div style={{ fontSize: 64, marginBottom: 16 }}>{isOwner ? '🍳' : '📦'}</div>
-            <div style={{ fontFamily: "'Fraunces',serif", fontSize: 22, fontWeight: 700, color: '#1C1507', marginBottom: 10 }}>
-              {filter !== 'All' ? `No ${filter} orders` : isOwner ? 'No orders yet' : 'No orders placed yet'}
+            <div style={{ fontSize: 64, marginBottom: 16 }}>
+              {isOwner ? "🍳" : "📦"}
             </div>
-            <div style={{ fontSize: 14, color: '#917850', marginBottom: 28 }}>
-              {isOwner ? 'Orders will appear here when customers place them.' : "Time to order something delicious!"}
+            <div
+              style={{
+                fontFamily: "'Fraunces',serif",
+                fontSize: 22,
+                fontWeight: 700,
+                color: "#1C1507",
+                marginBottom: 10,
+              }}
+            >
+              {filter !== "All"
+                ? `No ${filter} orders`
+                : isOwner
+                  ? "No orders yet"
+                  : "No orders placed yet"}
+            </div>
+            <div style={{ fontSize: 14, color: "#917850", marginBottom: 28 }}>
+              {isOwner
+                ? "Orders will appear here when customers place them."
+                : "Time to order something delicious!"}
             </div>
             {!isOwner && (
-              <button onClick={() => navigate('/')} style={{ background: 'linear-gradient(135deg,#F47B1F,#E8620A)', color: 'white', border: 'none', borderRadius: 16, padding: '14px 32px', fontFamily: "'Outfit',sans-serif", fontWeight: 800, fontSize: 15, cursor: 'pointer', boxShadow: '0 5px 20px rgba(244,123,31,0.4)' }}>
+              <button
+                onClick={() => navigate("/")}
+                style={{
+                  background: "linear-gradient(135deg,#F47B1F,#E8620A)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: 16,
+                  padding: "14px 32px",
+                  fontFamily: "'Outfit',sans-serif",
+                  fontWeight: 800,
+                  fontSize: 15,
+                  cursor: "pointer",
+                  boxShadow: "0 5px 20px rgba(244,123,31,0.4)",
+                }}
+              >
                 Explore Restaurants 🍽️
               </button>
             )}
@@ -136,6 +238,6 @@ function MyOrders() {
         )}
       </div>
     </div>
-  )
+  );
 }
-export default MyOrders
+export default MyOrders;

@@ -1,10 +1,16 @@
-import React from 'react'
-import { IoIosArrowRoundBack } from "react-icons/io"
-import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
-import CartItemCard from '../components/CartItemCard'
-import Nav from '../components/Nav'
-import { FaShieldAlt, FaTruck, FaTag, FaShoppingBag, FaArrowRight } from "react-icons/fa"
+import React from "react";
+import { IoIosArrowRoundBack } from "react-icons/io";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import CartItemCard from "../components/CartItemCard";
+import Nav from "../components/Nav";
+import {
+  FaShieldAlt,
+  FaTruck,
+  FaTag,
+  FaShoppingBag,
+  FaArrowRight,
+} from "react-icons/fa";
 
 const S = `
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Outfit:wght@400;500;600;700;800&display=swap');
@@ -47,25 +53,30 @@ const S = `
 /* EMPTY */
 .cp-empty{background:white;border-radius:28px;padding:80px 40px;text-align:center;box-shadow:0 4px 30px rgba(0,0,0,0.07);border:2px solid rgba(244,123,31,0.07);}
 @media(max-width:860px){.cp-grid{grid-template-columns:1fr;}.cp-summary{position:static;}}
-`
+`;
 
 function CartPage() {
-  const navigate = useNavigate()
-  const { cartItems, totalAmount } = useSelector(s => s.user)
-  const deliveryFee = totalAmount > 500 ? 0 : 40
-  const total = totalAmount + deliveryFee
-  const savings = deliveryFee === 0 ? 40 : 0
+  const navigate = useNavigate();
+  const { cartItems, totalAmount } = useSelector((s) => s.user);
+  const deliveryFee = totalAmount > 500 ? 0 : 40;
+  const total = totalAmount + deliveryFee;
+  const savings = deliveryFee === 0 ? 40 : 0;
 
   return (
     <div className="cp">
       <style>{S}</style>
       <Nav />
       <section className="cp-hero">
-        <div className="cp-hero-grid" /><div className="cp-hero-orb" />
+        <div className="cp-hero-grid" />
+        <div className="cp-hero-orb" />
         <div className="cp-hero-inner">
-          <div className="cp-badge"><FaShoppingBag size={11} />{cartItems.length} items in your cart</div>
+          <div className="cp-badge">
+            <FaShoppingBag size={11} />
+            {cartItems.length} items in your cart
+          </div>
           <h1 className="cp-title">
-            {cartItems.length === 0 ? 'Your cart is' : 'Review your'} <span>{cartItems.length === 0 ? 'empty' : 'order'}</span>
+            {cartItems.length === 0 ? "Your cart is" : "Review your"}{" "}
+            <span>{cartItems.length === 0 ? "empty" : "order"}</span>
           </h1>
           <p className="cp-sub">Free delivery on orders above ₹500</p>
         </div>
@@ -75,9 +86,35 @@ function CartPage() {
         {cartItems.length === 0 ? (
           <div className="cp-empty">
             <div style={{ fontSize: 72, marginBottom: 18 }}>🛒</div>
-            <div style={{ fontFamily: "'Fraunces',serif", fontSize: 24, fontWeight: 700, color: '#1C1507', marginBottom: 10 }}>Your cart is hungry</div>
-            <div style={{ fontSize: 14, color: '#917850', marginBottom: 28 }}>Add some delicious dishes to get started!</div>
-            <button onClick={() => navigate('/')} style={{ background: 'linear-gradient(135deg,#F47B1F,#E8620A)', color: 'white', border: 'none', borderRadius: 16, padding: '14px 32px', fontFamily: "'Outfit',sans-serif", fontWeight: 800, fontSize: 15, cursor: 'pointer', boxShadow: '0 5px 20px rgba(244,123,31,0.4)' }}>
+            <div
+              style={{
+                fontFamily: "'Fraunces',serif",
+                fontSize: 24,
+                fontWeight: 700,
+                color: "#1C1507",
+                marginBottom: 10,
+              }}
+            >
+              Your cart is hungry
+            </div>
+            <div style={{ fontSize: 14, color: "#917850", marginBottom: 28 }}>
+              Add some delicious dishes to get started!
+            </div>
+            <button
+              onClick={() => navigate("/")}
+              style={{
+                background: "linear-gradient(135deg,#F47B1F,#E8620A)",
+                color: "white",
+                border: "none",
+                borderRadius: 16,
+                padding: "14px 32px",
+                fontFamily: "'Outfit',sans-serif",
+                fontWeight: 800,
+                fontSize: 15,
+                cursor: "pointer",
+                boxShadow: "0 5px 20px rgba(244,123,31,0.4)",
+              }}
+            >
               Explore Restaurants 🍽️
             </button>
           </div>
@@ -85,36 +122,79 @@ function CartPage() {
           <div className="cp-grid">
             <div className="cp-items-section">
               <div className="cp-items-hd">
-                <div className="cp-items-title">{cartItems.length} Item{cartItems.length > 1 ? 's' : ''}</div>
-                <button className="cp-back-btn" onClick={() => navigate('/')}><IoIosArrowRoundBack size={18} />Continue Shopping</button>
+                <div className="cp-items-title">
+                  {cartItems.length} Item{cartItems.length > 1 ? "s" : ""}
+                </div>
+                <button className="cp-back-btn" onClick={() => navigate("/")}>
+                  <IoIosArrowRoundBack size={18} />
+                  Continue Shopping
+                </button>
               </div>
-              {cartItems.map((item, i) => <CartItemCard key={i} data={item} />)}
+              {cartItems.map((item, i) => (
+                <CartItemCard key={i} data={item} />
+              ))}
             </div>
 
             <div className="cp-summary">
               <div className="cp-summary-title">Order Summary</div>
-              <div className="cp-summary-row"><span>Subtotal</span><span style={{ color: '#1C1507', fontWeight: 700 }}>₹{totalAmount}</span></div>
               <div className="cp-summary-row">
-                <span>Delivery</span>
-                <span style={{ color: deliveryFee === 0 ? '#16a34a' : '#1C1507', fontWeight: 700 }}>
-                  {deliveryFee === 0 ? <span className="cp-free-tag">FREE</span> : `₹${deliveryFee}`}
+                <span>Subtotal</span>
+                <span style={{ color: "#1C1507", fontWeight: 700 }}>
+                  ₹{totalAmount}
                 </span>
               </div>
-              {savings > 0 && <div className="cp-summary-row"><span style={{ color: '#16a34a' }}>🎉 You saved</span><span style={{ color: '#16a34a', fontWeight: 700 }}>₹{savings}</span></div>}
-              <div className="cp-summary-row grand"><span>Total</span><span style={{ color: '#F47B1F' }}>₹{total}</span></div>
-              <button className="cp-checkout-btn" onClick={() => navigate('/checkout')}>
+              <div className="cp-summary-row">
+                <span>Delivery</span>
+                <span
+                  style={{
+                    color: deliveryFee === 0 ? "#16a34a" : "#1C1507",
+                    fontWeight: 700,
+                  }}
+                >
+                  {deliveryFee === 0 ? (
+                    <span className="cp-free-tag">FREE</span>
+                  ) : (
+                    `₹${deliveryFee}`
+                  )}
+                </span>
+              </div>
+              {savings > 0 && (
+                <div className="cp-summary-row">
+                  <span style={{ color: "#16a34a" }}>🎉 You saved</span>
+                  <span style={{ color: "#16a34a", fontWeight: 700 }}>
+                    ₹{savings}
+                  </span>
+                </div>
+              )}
+              <div className="cp-summary-row grand">
+                <span>Total</span>
+                <span style={{ color: "#F47B1F" }}>₹{total}</span>
+              </div>
+              <button
+                className="cp-checkout-btn"
+                onClick={() => navigate("/checkout")}
+              >
                 Place Order <FaArrowRight size={14} />
               </button>
               <div className="cp-trust">
-                <div className="cp-trust-item"><FaShieldAlt size={13} color="#16a34a" />Secure checkout</div>
-                <div className="cp-trust-item"><FaTruck size={13} color="#F47B1F" />Fast delivery</div>
-                <div className="cp-trust-item"><FaTag size={13} color="#6366f1" />Best prices</div>
+                <div className="cp-trust-item">
+                  <FaShieldAlt size={13} color="#16a34a" />
+                  Secure checkout
+                </div>
+                <div className="cp-trust-item">
+                  <FaTruck size={13} color="#F47B1F" />
+                  Fast delivery
+                </div>
+                <div className="cp-trust-item">
+                  <FaTag size={13} color="#6366f1" />
+                  Best prices
+                </div>
               </div>
             </div>
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }
-export default CartPage
+export default CartPage;
