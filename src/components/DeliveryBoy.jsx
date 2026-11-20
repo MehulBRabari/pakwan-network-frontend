@@ -75,7 +75,10 @@ function DeliveryBoy() {
   const [todayDeliveries, setTodayDeliveries] = useState([]);
   const [deliveryBoyLocation, setDeliveryBoyLocation] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [verifying, setVerifying] = useState(false);
   const [message, setMessage] = useState("");
+  const [otpError, setOtpError] = useState("");
+  const [otpInfo, setOtpInfo] = useState("");
 
   const totalDeliveriesToday = todayDeliveries.reduce(
     (sum, d) => sum + d.count,
@@ -159,8 +162,10 @@ function DeliveryBoy() {
 
   const sendOtp = async () => {
     setLoading(true);
+    setOtpError("");
+    setOtpInfo("");
     try {
-      await axios.post(
+      const result = await axios.post(
         `${serverUrl}/api/order/send-delivery-otp`,
         {
           orderId: currentOrder._id,
@@ -168,22 +173,34 @@ function DeliveryBoy() {
         },
         { withCredentials: true },
       );
+      setOtpInfo(result.data?.message || "OTP sent to the customer.");
+      setOtp("");
       setShowOtpBox(true);
     } catch (error) {
       console.log(error);
+      setOtpError(
+        error?.response?.data?.message ||
+          "Could not send the OTP. Please check your internet and try again.",
+      );
     }
     setLoading(false);
   };
 
   const verifyOtp = async () => {
     setMessage("");
+    setOtpError("");
+    if (!/^\d{4}$/.test(otp.trim())) {
+      setOtpError("Please enter the 4-digit OTP from the customer.");
+      return;
+    }
+    setVerifying(true);
     try {
       const result = await axios.post(
         `${serverUrl}/api/order/verify-delivery-otp`,
         {
           orderId: currentOrder._id,
           shopOrderId: currentOrder.shopOrder._id,
-          otp,
+          otp: otp.trim(),
         },
         { withCredentials: true },
       );
@@ -191,6 +208,10 @@ function DeliveryBoy() {
       setTimeout(() => window.location.reload(), 1200);
     } catch (error) {
       console.log(error);
+      setOtpError(
+        error?.response?.data?.message || "Could not verify the OTP. Please try again.",
+      );
+      setVerifying(false);
     }
   };
 
@@ -325,6 +346,20 @@ function DeliveryBoy() {
               </div>
             )}
 
+            {!showOtpBox && otpError && (
+              <p
+                role="alert"
+                style={{
+                  color: "#B42318",
+                  fontWeight: 700,
+                  fontSize: 13,
+                  margin: "12px 0 0",
+                  textAlign: "center",
+                }}
+              >
+                {otpError}
+              </p>
+            )}
             {!showOtpBox ? (
               <button
                 className="db-deliver-btn"
@@ -356,16 +391,47 @@ function DeliveryBoy() {
                   </span>
                 </p>
                 <p style={{ fontSize: 12, color: "#917850", marginBottom: 0 }}>
-                  Check their registered email/phone
+                  Ask the customer for the OTP shown in their app (My Orders)
+                  or sent to their email.
                 </p>
+                {otpInfo && !message && (
+                  <p
+                    style={{
+                      fontSize: 12,
+                      color: "#15803d",
+                      fontWeight: 700,
+                      margin: "8px 0 0",
+                    }}
+                  >
+                    {otpInfo}
+                  </p>
+                )}
                 <input
                   type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
                   className="db-otp-input"
                   placeholder="• • • •"
                   maxLength={4}
-                  onChange={(e) => setOtp(e.target.value)}
+                  onChange={(e) =>
+                    setOtp(e.target.value.replace(/\D/g, "").slice(0, 4))
+                  }
                   value={otp}
                 />
+                {otpError && (
+                  <p
+                    role="alert"
+                    style={{
+                      textAlign: "center",
+                      color: "#B42318",
+                      fontWeight: 700,
+                      fontSize: 13,
+                      marginBottom: 12,
+                    }}
+                  >
+                    {otpError}
+                  </p>
+                )}
                 {message && (
                   <p
                     style={{
@@ -379,8 +445,33 @@ function DeliveryBoy() {
                     ✓ {message}
                   </p>
                 )}
-                <button className="db-submit-btn" onClick={verifyOtp}>
-                  Confirm Delivery
+                <button
+                  className="db-submit-btn"
+                  onClick={verifyOtp}
+                  disabled={verifying || !!message}
+                >
+                  {verifying ? (
+                    <ClipLoader size={18} color="white" />
+                  ) : (
+                    "Confirm Delivery"
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={sendOtp}
+                  disabled={loading || verifying || !!message}
+                  style={{
+                    width: "100%",
+                    marginTop: 10,
+                    background: "transparent",
+                    border: "none",
+                    color: "#F47B1F",
+                    fontWeight: 700,
+                    fontSize: 13,
+                    cursor: "pointer",
+                  }}
+                >
+                  {loading ? "Sending…" : "Resend OTP"}
                 </button>
               </div>
             )}

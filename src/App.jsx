@@ -24,7 +24,7 @@ import Shop from "./pages/Shop";
 import LandingPage from "./pages/LandingPage";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
-import { setSocket } from "./redux/userSlice";
+import { setSocket, setRealtimeDeliveryOtp } from "./redux/userSlice";
 import InvoicePage from "./pages/InvoicePage";
 
 // export const serverUrl = "http://localhost:8000";
@@ -49,6 +49,10 @@ function App() {
       if (userData) {
         socketInstance.emit("identity", { userId: userData._id });
       }
+    });
+    // Customer: show the delivery OTP as soon as the delivery partner requests it
+    socketInstance.on("deliveryOtp", (data) => {
+      dispatch(setRealtimeDeliveryOtp(data));
     });
     return () => {
       socketInstance.disconnect();

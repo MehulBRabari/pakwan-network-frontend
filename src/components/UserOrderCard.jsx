@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { serverUrl } from "../App";
 import { FaStar } from "react-icons/fa";
 import { MdOutlineTrackChanges } from "react-icons/md";
+import DeliveryOtpBadge from "./DeliveryOtpBadge";
 
 const STATUS_COLOR = {
   pending: "#f59e0b",
@@ -173,6 +174,7 @@ function UserOrderCard({ data }) {
                 </div>
               ))}
             </div>
+            <DeliveryOtpBadge shopOrder={shopOrder} />
             <div
               style={{
                 display: "flex",

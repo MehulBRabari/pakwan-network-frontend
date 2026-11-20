@@ -111,6 +111,19 @@ const userSlice = createSlice({
       }
     },
 
+    // Customer receives the delivery OTP live (socket event "deliveryOtp")
+    setRealtimeDeliveryOtp: (state, action) => {
+      const { orderId, shopOrderId, otp, otpExpires } = action.payload
+      const order = state.myOrders.find(o => String(o._id) == String(orderId))
+      if (order && Array.isArray(order.shopOrders)) {
+        const shopOrder = order.shopOrders.find(so => String(so._id) == String(shopOrderId))
+        if (shopOrder) {
+          shopOrder.deliveryOtp = otp
+          shopOrder.otpExpires = otpExpires
+        }
+      }
+    },
+
     setSearchItems: (state, action) => {
       state.searchItems = action.payload
     },
@@ -122,5 +135,5 @@ const userSlice = createSlice({
   }
 })
 
-export const { setUserData, setCurrentAddress, setCurrentCity, setCurrentState, setShopsInMyCity, setItemsInMyCity, addToCart, updateQuantity, removeCartItem, setMyOrders, addMyOrder, updateOrderStatus, setSearchItems, setTotalAmount, setSocket, updateRealtimeOrderStatus, clearCart } = userSlice.actions
+export const { setUserData, setCurrentAddress, setCurrentCity, setCurrentState, setShopsInMyCity, setItemsInMyCity, addToCart, updateQuantity, removeCartItem, setMyOrders, addMyOrder, updateOrderStatus, setSearchItems, setTotalAmount, setSocket, updateRealtimeOrderStatus, setRealtimeDeliveryOtp, clearCart } = userSlice.actions
 export default userSlice.reducer

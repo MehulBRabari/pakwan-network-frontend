@@ -6,6 +6,7 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import { MdDeliveryDining, MdPhone } from "react-icons/md";
 import { FaStore, FaCheckCircle, FaClock, FaFire } from "react-icons/fa";
 import DeliveryBoyTracking from "../components/DeliveryBoyTracking";
+import DeliveryOtpBadge from "../components/DeliveryOtpBadge";
 import { useSelector } from "react-redux";
 import Nav from "../components/Nav";
 
@@ -94,14 +95,36 @@ function TrackOrderPage() {
       if (String(changedOrderId) === String(orderId)) loadOrder();
     };
 
+    const handleDeliveryOtp = ({
+      orderId: otpOrderId,
+      shopOrderId,
+      otp,
+      otpExpires,
+    }) => {
+      if (String(otpOrderId) !== String(orderId)) return;
+      setOrder((prev) => {
+        if (!prev?.shopOrders) return prev;
+        return {
+          ...prev,
+          shopOrders: prev.shopOrders.map((so) =>
+            String(so._id) === String(shopOrderId)
+              ? { ...so, deliveryOtp: otp, otpExpires }
+              : so,
+          ),
+        };
+      });
+    };
+
     socket.on("updateDeliveryLocation", handleLocation);
     socket.on("update-status", handleStatus);
     socket.on("deliveryBoyAssigned", handleAssignment);
+    socket.on("deliveryOtp", handleDeliveryOtp);
 
     return () => {
       socket.off("updateDeliveryLocation", handleLocation);
       socket.off("update-status", handleStatus);
       socket.off("deliveryBoyAssigned", handleAssignment);
+      socket.off("deliveryOtp", handleDeliveryOtp);
     };
   }, [socket, orderId, loadOrder]);
 
@@ -256,6 +279,8 @@ function TrackOrderPage() {
                 <strong style={{ color: "#1C1507" }}>Delivery Address:</strong>{" "}
                 {order.deliveryAddress?.text}
               </div>
+
+              <DeliveryOtpBadge shopOrder={shopOrder} />
 
               {/* Driver Info */}
               {shopOrder.status !== "delivered" &&
