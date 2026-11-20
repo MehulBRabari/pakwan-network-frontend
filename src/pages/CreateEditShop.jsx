@@ -47,6 +47,7 @@ function CreateEditShop() {
   const [frontendImage, setFrontendImage] = useState(myShopData?.image || null);
   const [backendImage, setBackendImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const dispatch = useDispatch();
 
   const handleImage = (e) => {
@@ -60,6 +61,7 @@ function CreateEditShop() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
     try {
       const fd = new FormData();
       fd.append("name", name);
@@ -74,6 +76,10 @@ function CreateEditShop() {
       navigate("/");
     } catch (e) {
       console.log(e);
+      setError(
+        e?.response?.data?.message ||
+          "Could not save the restaurant. Please try again.",
+      );
     }
     setLoading(false);
   };
@@ -338,6 +344,23 @@ function CreateEditShop() {
               </div>
             </div>
 
+            {error && (
+              <p
+                role="alert"
+                style={{
+                  color: "#B42318",
+                  background: "#FEF3F2",
+                  border: "1px solid #FECDCA",
+                  borderRadius: 12,
+                  padding: "10px 14px",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  marginBottom: 14,
+                }}
+              >
+                {error}
+              </p>
+            )}
             <button
               className="cs-submit"
               type="submit"

@@ -60,6 +60,7 @@ function EditItem() {
   const [category, setCategory] = useState("");
   const [foodType, setFoodType] = useState("veg");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -84,6 +85,7 @@ function EditItem() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
     try {
       const fd = new FormData();
       fd.append("name", name);
@@ -100,6 +102,10 @@ function EditItem() {
       navigate("/");
     } catch (e) {
       console.log(e);
+      setError(
+        e?.response?.data?.message ||
+          "Could not save the item. Please try again.",
+      );
     }
     setLoading(false);
   };
@@ -355,6 +361,23 @@ function EditItem() {
                 ))}
               </div>
             </div>
+            {error && (
+              <p
+                role="alert"
+                style={{
+                  color: "#B42318",
+                  background: "#FEF3F2",
+                  border: "1px solid #FECDCA",
+                  borderRadius: 12,
+                  padding: "10px 14px",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  marginBottom: 14,
+                }}
+              >
+                {error}
+              </p>
+            )}
             <button className="ei-submit" type="submit" disabled={loading}>
               {loading ? (
                 <ClipLoader size={20} color="white" />
